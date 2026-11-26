@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AstraPath</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/astrapath-logo.svg') }}" />
+
+  <!-- Typography: Inter (UI) & JetBrains Mono (Numeric Telemetry) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Leaflet CSS & JS (Zero API Key) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="basemap-light">
+  <!-- Full-Bleed Map Canvas -->
+  <div id="map" aria-label="Interactive road network map"></div>
+
+  <!-- Top-Center Loading Pill -->
+  <div id="loadingPill" class="floating-loading-pill hidden" role="status" aria-live="polite">
+    <span class="spinner" aria-hidden="true"></span>
+    <span id="loadingPillText">Finding optimal route…</span>
+  </div>
+
+  <!-- Top-Right Ultra-Slim Traffic Legend Pill -->
+  <div class="traffic-legend-pill" aria-label="Traffic color legend">
+    <span class="legend-item"><span class="legend-dot dot-smooth"></span>Smooth</span>
+    <span class="legend-sep">&middot;</span>
+    <span class="legend-item"><span class="legend-dot dot-moderate"></span>Moderate</span>
+    <span class="legend-sep">&middot;</span>
+    <span class="legend-item"><span class="legend-dot dot-heavy"></span>Heavy</span>
+    <span class="legend-sep">&middot;</span>
+    <span class="legend-item"><span class="legend-dot dot-closed"></span>Closed</span>
+  </div>
+
+  <!-- Top-Left Single Floating Navigation Card -->
+  <aside id="navCard" class="nav-card" aria-label="Route planner and telemetry">
+    <!-- Compact Header Bar -->
+    <header class="nav-card-header">
+      <div class="brand-group">
+        <svg class="brand-logo" width="22" height="22" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <rect x="4" y="4" width="56" height="56" rx="14" fill="#2563EB"/>
+          <path d="M18 44L30 28L46 38" stroke="#93C5FD" stroke-opacity="0.45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18 44L22 20L46 18" stroke="#93C5FD" stroke-opacity="0.45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18 44C24 44 26 30 34 26C40 23 44 20 46 18" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="18" cy="44" r="4.5" fill="#16A34A" stroke="#FFFFFF" stroke-width="2"/>
+          <circle cx="30" cy="28" r="2.8" fill="#BFDBFE"/>
+          <circle cx="46" cy="38" r="2.8" fill="#BFDBFE"/>
+          <path d="M46 11L47.9 16.1L53 18L47.9 19.9L46 25L44.1 19.9L39 18L44.1 16.1L46 11Z" fill="#FFFFFF"/>
+        </svg>
+        <span class="brand-title">AstraPath</span>
+      </div>
+
+      <div class="header-actions">
+        <div class="segmented-pill" role="tablist" aria-label="Data source mode">
+          <button type="button" data-source="live" class="segmented-btn is-active" role="tab" aria-selected="true">Live</button>
+          <button type="button" data-source="offline" class="segmented-btn" role="tab" aria-selected="false">Offline</button>
+        </div>
+        <button
+          id="collapseCardBtn"
+          type="button"
+          class="icon-btn"
+          title="Collapse navigation panel"
+          aria-expanded="true"
+          aria-controls="navCardBody"
+        >
+          <svg id="collapseChevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Collapsible Card Body -->
+    <div id="navCardBody" class="nav-card-body">
+      <!-- Unified Google Maps-Style Waypoint Box -->
+      <div class="planner-section">
+        <div class="waypoint-box">
+          <!-- Left Vertical Route Rail -->
+          <div class="route-rail" aria-hidden="true">
+            <span class="rail-origin-dot"></span>
+            <span class="rail-connector"></span>
+            <span class="rail-dest-dot"></span>
+          </div>
+
+          <!-- Waypoint Inputs (Live Mode) -->
+          <div id="liveSearchControls" class="waypoint-fields">
+            <div class="waypoint-row">
+              <input
+                id="liveStartInput"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter starting location..."
+                aria-label="Origin location"
+                class="waypoint-input"
+              />
+              <div class="waypoint-inline-actions">
+                <button id="clearStartBtn" type="button" class="inline-icon-btn hidden" title="Clear starting location" aria-label="Clear starting location">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+                <button id="geoLocateBtn" type="button" class="inline-icon-btn" title="Use my current location" aria-label="Use my current location">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+                    <circle cx="12" cy="12" r="7"></circle>
+                  </svg>
+                </button>
+                <button id="pickStartMapBtn" type="button" class="inline-icon-btn" title="Pick origin on map" aria-label="Pick origin on map">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              <div id="liveStartResults" class="autocomplete-menu hidden"></div>
+            </div>
+
+            <div class="waypoint-divider"></div>
+
+            <div class="waypoint-row">
+              <input
+                id="liveGoalInput"
+                type="text"
+                autocomplete="off"
+                placeholder="Enter destination..."
+                aria-label="Destination location"
+                class="waypoint-input"
+              />
+              <div class="waypoint-inline-actions">
+                <button id="clearGoalBtn" type="button" class="inline-icon-btn hidden" title="Clear destination" aria-label="Clear destination">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+                <button id="pickGoalMapBtn" type="button" class="inline-icon-btn" title="Pick destination on map" aria-label="Pick destination on map">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              <div id="liveGoalResults" class="autocomplete-menu hidden"></div>
+            </div>
+          </div>
+
+          <!-- Waypoint Selects (Offline Backup Mode) -->
+          <div id="offlineSelectControls" class="waypoint-fields hidden">
+            <div class="waypoint-row">
+              <select id="startSelect" class="waypoint-select" aria-label="Offline origin intersection"></select>
+            </div>
+            <div class="waypoint-divider"></div>
+            <div class="waypoint-row">
+              <select id="endSelect" class="waypoint-select" aria-label="Offline destination intersection"></select>
+            </div>
+          </div>
+
+          <!-- Circular Swap Button on Right Divider Edge -->
+          <button id="swapWaypointsBtn" type="button" class="swap-circle-btn" title="Swap origin and destination" aria-label="Swap origin and destination">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Action Row: Fastest/Shortest Segmented Control + Calculate Button -->
+        <div class="action-row">
+          <div class="segmented-pill mode-segmented" role="group" aria-label="Routing objective">
+            <button type="button" data-mode="fastest" class="mode-btn is-active">Fastest</button>
+            <button type="button" data-mode="shortest" class="mode-btn">Shortest</button>
+          </div>
+          <button id="findRouteBtn" type="button" class="primary-btn">
+            Calculate
+          </button>
+        </div>
+
+        <!-- Map-Pick Hint & Inline Notice Banner -->
+        <div id="mapPickHint" class="subtle-hint">Enter locations or click the map to set origin</div>
+        <div id="alertBanner" class="inline-notice hidden" role="status"></div>
+      </div>
+
+      <!-- Progressive Disclosure Results -->
+      <div id="resultsContainer" class="results-container hidden">
+        <!-- Route Hero Summary -->
+        <div class="route-hero-wrap">
+          <div class="route-hero">
+            <div class="hero-metrics">
+              <span id="metricEta" class="hero-eta num">-- min</span>
+              <span id="metricDistance" class="hero-distance num">-- km</span>
+            </div>
+            <div class="hero-tags">
+              <span id="graphSourcePill" class="source-tag">Live OSM</span>
+              <span id="longDistancePill" class="notice-tag hidden">Highway mode</span>
+            </div>
+          </div>
+          <div id="heroAlgoSummary" class="hero-algo-summary num hidden">
+            A*: -- nodes (-- ms)
+          </div>
+        </div>
+
+        <!-- 3-Tab Strip -->
+        <nav class="tab-strip" role="tablist" aria-label="Route details">
+          <button type="button" data-tab="directions" class="tab-btn is-active" role="tab" aria-selected="true">Directions</button>
+          <button type="button" data-tab="algorithm" class="tab-btn" role="tab" aria-selected="false">Algorithm</button>
+          <button type="button" data-tab="traffic" class="tab-btn" role="tab" aria-selected="false">Traffic</button>
+        </nav>
+
+        <!-- Tab Panels -->
+        <div class="tab-panels">
+          <!-- Tab 1: Directions -->
+          <section id="tabDirections" class="tab-panel" role="tabpanel">
+            <ol id="itineraryList" class="directions-list"></ol>
+          </section>
+
+          <!-- Tab 2: Algorithm -->
+          <section id="tabAlgorithm" class="tab-panel hidden" role="tabpanel">
+            <div class="algo-summary-row">
+              <span id="graphScaleText" class="graph-scale-text num">-- intersections &middot; -- roads</span>
+              <span id="efficiencyBadge" class="efficiency-pill num">--% fewer nodes</span>
+            </div>
+
+            <div id="dijkstraCard" class="comparison-bars">
+              <div class="bar-item">
+                <div class="bar-header">
+                  <span>A* search</span>
+                  <span id="astarStatsText" class="num">-- nodes &middot; -- ms</span>
+                </div>
+                <div class="bar-track">
+                  <div id="astarBar" class="bar-fill bar-astar" style="width: 0%"></div>
+                </div>
+              </div>
+              <div class="bar-item">
+                <div class="bar-header">
+                  <span class="muted">Dijkstra baseline</span>
+                  <span id="dijkstraStatsText" class="num muted">-- nodes &middot; -- ms</span>
+                </div>
+                <div class="bar-track">
+                  <div id="dijkstraBar" class="bar-fill bar-dijkstra" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="algo-controls">
+              <label class="switch-row">
+                <input id="animateToggle" type="checkbox" checked class="toggle-input" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span class="switch-label">Animate search frontier</span>
+              </label>
+              <label class="switch-row">
+                <input id="dijkstraToggle" type="checkbox" checked class="toggle-input" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span class="switch-label">Compare Dijkstra</span>
+              </label>
+              <button id="replayBtn" type="button" class="secondary-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span>Replay</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- Tab 3: Traffic -->
+          <section id="tabTraffic" class="tab-panel hidden" role="tabpanel">
+            <div class="preset-strip" role="group" aria-label="Traffic presets">
+              <button type="button" data-preset="normal" class="preset-pill is-active">Normal</button>
+              <button type="button" data-preset="rush_hour" class="preset-pill">Rush Hour</button>
+              <button type="button" data-preset="random_jam" class="preset-pill">Heavy</button>
+              <button id="resetTrafficBtn" type="button" class="preset-pill">Reset</button>
+            </div>
+
+            <div id="roadInspectorEmpty" class="inspector-empty">
+              Click any road on the map to adjust congestion or close it.
+            </div>
+
+            <div id="roadInspectorActive" class="inspector-card hidden">
+              <div class="inspector-header">
+                <div id="inspectorRoadName" class="inspector-title">Road name</div>
+                <div id="inspectorRoadMeta" class="inspector-meta num">-- km &middot; -- km/h</div>
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span>Congestion factor</span>
+                  <span id="edgeWeightVal" class="num">1.00x</span>
+                </div>
+                <input id="edgeWeightSlider" type="range" min="1.0" max="3.0" step="0.05" value="1.0" class="clean-slider" />
+              </div>
+
+              <label class="switch-row">
+                <input id="edgeBlockedToggle" type="checkbox" class="toggle-input" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                <span class="switch-label">Close road segment</span>
+              </label>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Bottom-Right Map Controls: Graph Toggle + Basemap Switcher + Zoom/Recenter Stack -->
+  <div class="map-controls-br">
+    <button id="graphOverlayBtn" type="button" class="overlay-toggle-pill is-active" aria-pressed="true" title="Toggle road network and junctions">
+      <span class="overlay-dot" aria-hidden="true"></span>
+      <span>Graph</span>
+    </button>
+
+    <div class="basemap-switcher" role="group" aria-label="Map style">
+      <button type="button" data-basemap="light" class="basemap-btn is-active">Map</button>
+      <button type="button" data-basemap="dark" class="basemap-btn">Dark</button>
+      <button type="button" data-basemap="satellite" class="basemap-btn">Satellite</button>
+    </div>
+
+    <div class="zoom-stack" role="group" aria-label="Map camera controls">
+      <button id="zoomInBtn" type="button" class="stack-btn" title="Zoom in" aria-label="Zoom in">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+      <button id="zoomOutBtn" type="button" class="stack-btn" title="Zoom out" aria-label="Zoom out">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+      <button id="resetViewBtn" type="button" class="stack-btn" title="Recenter route" aria-label="Recenter route">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+</body>
+</html>

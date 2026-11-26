@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments & secrets
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editors & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs, temp & binaries
+*.log
+*.tmp
+*.exe
+*.zip
+
+# Internal spec & agent memory markdown files (keep README.md tracked)
+prd.md
+architecture.md
+rules.md
+phases.md
+design.md
+memory.md
