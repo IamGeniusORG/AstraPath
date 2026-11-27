@@ -32,12 +32,21 @@ def test_index_and_static_assets(client) -> None:
 
     css_resp = client.get("/static/css/style.css")
     assert css_resp.status_code == 200
+    assert "text/css" in css_resp.headers.get("Content-Type", "")
 
     js_resp = client.get("/static/js/map.js")
     assert js_resp.status_code == 200
+    assert "javascript" in js_resp.headers.get("Content-Type", "")
+
+    off_js_resp = client.get("/static/js/offline_engine.js")
+    assert off_js_resp.status_code == 200
+    assert "javascript" in off_js_resp.headers.get("Content-Type", "")
 
     svg_resp = client.get("/static/img/astrapath-logo.svg")
     assert svg_resp.status_code == 200
+
+    sw_resp = client.get("/sw.js")
+    assert sw_resp.status_code == 200
 
 
 def test_get_graph_endpoint(client) -> None:

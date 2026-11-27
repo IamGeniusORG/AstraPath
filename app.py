@@ -48,12 +48,13 @@ from core.heuristics import haversine_km
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_PATH = BASE_DIR / "data" / "city_map.json"
+STATIC_DIR = BASE_DIR / "static"
 
 MAX_GEOCODE_QUERY_LEN: int = 120
 MAX_TRAFFIC_OVERRIDES: int = 500
 CONNECTIVITY_CACHE_TTL_S: float = 5.0
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=None, template_folder=str(BASE_DIR / "templates"))
 
 # Active in-memory base city road network state for Offline Preset simulation.
 CITY_GRAPH: CityGraph = CityGraph.from_json_file(DATA_PATH)
@@ -221,6 +222,12 @@ def handle_internal_error(err: Any) -> tuple[Any, int]:
 def index() -> str:
     """Serve the AstraPath single-page dashboard."""
     return render_template("index.html")
+
+
+@app.route("/static/<path:filename>", endpoint="static", methods=["GET"])
+def serve_static_files(filename: str) -> Any:
+    """Serve static assets explicitly for both Vercel serverless and local Flask."""
+    return send_from_directory(STATIC_DIR, filename)
 
 
 @app.route("/sw.js", methods=["GET"])
