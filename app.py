@@ -9,7 +9,9 @@ import socket
 import time
 from pathlib import Path
 from typing import Any
+from urllib.parse import unquote
 
+import requests
 from flask import Flask, jsonify, make_response, render_template, request, send_from_directory
 
 from core.graph import (
@@ -272,6 +274,70 @@ def check_connectivity() -> tuple[Any, int]:
 
     _connectivity_cache = (now, is_online)
     return jsonify({"online": is_online}), 200
+
+
+@app.route("/api/ip-location", methods=["GET"])
+def get_ip_location() -> Any:
+    """Return approximate IP geolocation from Vercel headers or fast local fallback."""
+    v_lat = request.headers.get("x-vercel-ip-latitude")
+    v_lng = request.headers.get("x-vercel-ip-longitude")
+    if v_lat is not None and v_lng is not None:
+        try:
+            lat = _parse_finite_float(v_lat, -90.0, 90.0, "x-vercel-ip-latitude")
+            lng = _parse_finite_float(v_lng, -180.0, 180.0, "x-vercel-ip-longitude")
+            city = unquote(request.headers.get("x-vercel-ip-city") or "").strip()
+            region = unquote(request.headers.get("x-vercel-ip-country-region") or "").strip()
+            country = unquote(request.headers.get("x-vercel-ip-country") or "").strip()
+            parts = [p for p in (city, region or country) if p]
+            label = ", ".join(parts) if parts else f"{lat:.4f}, {lng:.4f}"
+            resp = make_response(
+                jsonify(
+                    {
+                        "lat": lat,
+                        "lng": lng,
+                        "label": label,
+                        "approximate": True,
+                        "source": "vercel_ip",
+                    }
+                ),
+                200,
+            )
+            resp.headers["Cache-Control"] = "no-store"
+            return resp
+        except ValueError:
+            pass
+
+    try:
+        r = requests.get("https://ipwho.is/", timeout=2.5)
+        if r.ok:
+            data = r.json()
+            if isinstance(data, dict) and data.get("success") is True:
+                lat = _parse_finite_float(data.get("latitude"), -90.0, 90.0, "latitude")
+                lng = _parse_finite_float(data.get("longitude"), -180.0, 180.0, "longitude")
+                city = str(data.get("city") or "").strip()
+                region = str(data.get("region") or data.get("country") or "").strip()
+                parts = [p for p in (city, region) if p]
+                label = ", ".join(parts) if parts else f"{lat:.4f}, {lng:.4f}"
+                resp = make_response(
+                    jsonify(
+                        {
+                            "lat": lat,
+                            "lng": lng,
+                            "label": label,
+                            "approximate": True,
+                            "source": "ipwho",
+                        }
+                    ),
+                    200,
+                )
+                resp.headers["Cache-Control"] = "no-store"
+                return resp
+    except (requests.RequestException, ValueError, TypeError):
+        pass
+
+    resp = make_response(jsonify({"error": "IP location unavailable."}), 404)
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 @app.route("/api/graph", methods=["GET"])

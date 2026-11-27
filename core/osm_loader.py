@@ -34,10 +34,10 @@ MIN_BBOX_PAD_DEG: float = 0.008
 MAX_BBOX_PAD_DEG: float = 0.025
 BBOX_PAD_RATIO: float = 0.12
 
-OVERPASS_CONNECT_TIMEOUT_S: float = 2.5
-OVERPASS_READ_TIMEOUT_S: float = 4.5
-CORRIDOR_TIMEOUT_S: float = 6.0
-OVERPASS_MAX_DISTANCE_KM: float = 10.0
+OVERPASS_CONNECT_TIMEOUT_S: float = 2.0
+OVERPASS_READ_TIMEOUT_S: float = 3.5
+CORRIDOR_TIMEOUT_S: float = 3.5
+OVERPASS_MAX_DISTANCE_KM: float = 8.0
 
 CACHE_TTL_SECONDS: int = 900
 CACHE_MAX_REGIONS: int = 10
@@ -167,7 +167,7 @@ def _geocode_via_photon(clean_q: str, limit: int) -> list[dict[str, Any]]:
         PHOTON_SEARCH_URL,
         params={"q": clean_q, "limit": limit},
         headers={"User-Agent": USER_AGENT},
-        timeout=4.5,
+        timeout=3.5,
     )
     resp.raise_for_status()
     payload = resp.json()
@@ -191,7 +191,7 @@ def _geocode_via_nominatim(clean_q: str, limit: int) -> list[dict[str, Any]]:
             "addressdetails": 1,
         },
         headers={"User-Agent": USER_AGENT},
-        timeout=4.5,
+        timeout=3.5,
     )
     resp.raise_for_status()
     items = resp.json()
@@ -267,7 +267,7 @@ def reverse_geocode(lat: float, lng: float) -> dict[str, Any]:
                 "addressdetails": 1,
             },
             headers={"User-Agent": USER_AGENT},
-            timeout=4.5,
+            timeout=3.5,
         )
         resp.raise_for_status()
         item = resp.json()
@@ -355,7 +355,7 @@ def _race_overpass_tier(
     """Race Overpass mirrors for a given highway filter using single-pass out geom."""
     south, west, north, east = bbox
     query = (
-        "[out:json][timeout:5];\n"
+        "[out:json][timeout:4];\n"
         f'(way["highway"~"^({highway_regex})$"]({south:.5f},{west:.5f},{north:.5f},{east:.5f}););\n'
         "out geom;\n"
     )
@@ -688,18 +688,24 @@ def build_corridor_fallback_graph(
     ]
 
     all_routes: list[tuple[int, dict[str, Any]]] = []
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    executor = ThreadPoolExecutor(max_workers=3)
+    try:
         future_map = {
             executor.submit(_fetch_osrm_corridor, wps, alts): idx
             for idx, (wps, alts) in enumerate(queries)
         }
-        for future in as_completed(future_map):
-            q_idx = future_map[future]
-            try:
-                for route in future.result():
-                    all_routes.append((q_idx, route))
-            except Exception:
-                continue
+        try:
+            for future in as_completed(future_map, timeout=4.0):
+                q_idx = future_map[future]
+                try:
+                    for route in future.result():
+                        all_routes.append((q_idx, route))
+                except Exception:
+                    continue
+        except TimeoutError:
+            pass
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
 
     if not all_routes:
         raise OSMServiceError(

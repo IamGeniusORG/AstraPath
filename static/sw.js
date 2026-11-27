@@ -1,5 +1,5 @@
 /* AstraPath Lightweight App-Shell Service Worker */
-const CACHE_NAME = "astrapath-shell-v1";
+const CACHE_NAME = "astrapath-shell-v3";
 const PRECACHE_URLS = [
   "/",
   "/static/css/style.css",

@@ -397,3 +397,24 @@ def test_vercel_offline_bundle_sw_stateless_places_and_readonly_fs(client, monke
     ro_delete = client.delete("/api/offline/places/U1")
     assert ro_delete.status_code == 200
     assert ro_delete.get_json()["storage"] == "browser_only"
+
+
+def test_ip_location_vercel_headers_and_decoding(client) -> None:
+    """Verify GET /api/ip-location decodes Vercel IP headers and returns no-store."""
+    resp = client.get(
+        "/api/ip-location",
+        headers={
+            "X-Vercel-IP-Latitude": "28.6139",
+            "X-Vercel-IP-Longitude": "77.2090",
+            "X-Vercel-IP-City": "New%20Delhi",
+            "X-Vercel-IP-Country-Region": "DL",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.headers.get("Cache-Control") == "no-store"
+    data = resp.get_json()
+    assert data["lat"] == pytest.approx(28.6139)
+    assert data["lng"] == pytest.approx(77.2090)
+    assert data["label"] == "New Delhi, DL"
+    assert data["approximate"] is True
+    assert data["source"] == "vercel_ip"

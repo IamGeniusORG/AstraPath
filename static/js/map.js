@@ -2152,55 +2152,151 @@
     dom.mapPickHint.textContent = "Click anywhere on the map to set destination";
   });
 
-  // Live GPS + LocalStorage Caching
-  dom.geoLocateBtn.addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      showNotice("Browser geolocation is unavailable.");
-      return;
-    }
-    setLoading(true, "Detecting current location…");
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
+  // 4-Tier Location Resolution Cascade (High-Acc GPS -> Low-Acc Browser -> Server IP -> Cached GPS)
+  function getPositionAsync(options) {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject({ code: 2, message: "Geolocation unavailable" });
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(resolve, reject, options);
+    });
+  }
+
+  async function resolveUserLocation({ allowApproximate = true, buttonEl = null } = {}) {
+    if (buttonEl) buttonEl.classList.add("is-locating");
+    let permissionDenied = false;
+
+    try {
+      // Tier 1: High-Accuracy GPS (Mobile)
+      try {
+        const pos = await getPositionAsync({
+          enableHighAccuracy: true,
+          timeout: 4500,
+          maximumAge: 60000,
+        });
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         localStorage.setItem(LAST_GPS_KEY, JSON.stringify({ lat, lng, timestamp: Date.now() }));
-        const coordLabel = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        return { lat, lng, label: null, source: "gps_high", approximate: false };
+      } catch (err1) {
+        if (err1 && err1.code === 1) {
+          permissionDenied = true;
+        } else if (err1 && (err1.code === 2 || err1.code === 3)) {
+          // Tier 2: Fast Low-Accuracy Browser Geolocation (Laptops)
+          try {
+            const pos2 = await getPositionAsync({
+              enableHighAccuracy: false,
+              timeout: 6000,
+              maximumAge: 300000,
+            });
+            const lat = pos2.coords.latitude;
+            const lng = pos2.coords.longitude;
+            localStorage.setItem(LAST_GPS_KEY, JSON.stringify({ lat, lng, timestamp: Date.now() }));
+            return { lat, lng, label: null, source: "gps_low", approximate: false };
+          } catch (err2) {
+            if (err2 && err2.code === 1) permissionDenied = true;
+          }
+        }
+      }
 
-        state.liveStart = { lat, lng, name: coordLabel };
-        dom.liveStartInput.value = coordLabel;
-        state.pickMode = null;
-        const geocodeSeq = ++state.originGeocodeSeq;
-        state.overrides = {};
-        hideNotice();
-        updateLiveActionIcons();
-        updatePickHint();
-        renderPendingLivePins();
-        map.flyTo([lat, lng], 13, { duration: 0.5 });
-
+      // Tier 3: Instant Server IP Geolocation
+      if (allowApproximate && state.isOnline) {
         try {
-          const resp = await fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`);
+          const resp = await fetch("/api/ip-location", { cache: "no-store" });
           if (resp.ok) {
-            const geo = await resp.json();
-            if (geo.name) {
-              if (geocodeSeq !== state.originGeocodeSeq || !state.liveStart) return;
-              state.liveStart.name = geo.name;
-              dom.liveStartInput.value = geo.name;
-              renderPendingLivePins();
+            const data = await resp.json();
+            if (typeof data.lat === "number" && typeof data.lng === "number") {
+              return {
+                lat: data.lat,
+                lng: data.lng,
+                label: data.label || `${data.lat.toFixed(4)}, ${data.lng.toFixed(4)}`,
+                source: "ip",
+                approximate: true,
+                permissionDenied,
+              };
             }
           }
         } catch {
-          // keep coordinate label
+          // proceed to Tier 4
         }
+      }
 
-        if (state.liveGoal) await computeRoute({ flyToRoute: true });
-        else setLoading(false);
-      },
-      (err) => {
-        setLoading(false);
-        showNotice(`Location unavailable: ${err.message}`);
-      },
-      { enableHighAccuracy: true, timeout: 6000, maximumAge: 60000 }
-    );
+      // Tier 4: Cached Last GPS Fix
+      try {
+        const raw = localStorage.getItem(LAST_GPS_KEY);
+        if (raw) {
+          const cached = JSON.parse(raw);
+          if (typeof cached.lat === "number" && typeof cached.lng === "number") {
+            return {
+              lat: cached.lat,
+              lng: cached.lng,
+              label: "My Location (Last GPS)",
+              source: "cache",
+              approximate: true,
+              permissionDenied,
+            };
+          }
+        }
+      } catch {
+        // ignore storage error
+      }
+
+      return { error: permissionDenied ? "Location permission denied." : "Location unavailable.", permissionDenied };
+    } finally {
+      if (buttonEl) buttonEl.classList.remove("is-locating");
+    }
+  }
+
+  // Live GPS + 4-Tier Fallback
+  dom.geoLocateBtn.addEventListener("click", async () => {
+    setLoading(true, "Detecting current location…");
+    const loc = await resolveUserLocation({ allowApproximate: true, buttonEl: dom.geoLocateBtn });
+    if (loc.error) {
+      setLoading(false);
+      showNotice(loc.error);
+      return;
+    }
+
+    const { lat, lng } = loc;
+    const coordLabel = loc.label || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+    state.liveStart = { lat, lng, name: coordLabel };
+    dom.liveStartInput.value = coordLabel;
+    state.pickMode = null;
+    const geocodeSeq = ++state.originGeocodeSeq;
+    state.overrides = {};
+    hideNotice();
+    updateLiveActionIcons();
+    updatePickHint();
+    renderPendingLivePins();
+    map.flyTo([lat, lng], 13, { duration: 0.5 });
+
+    if (loc.source === "ip") {
+      showToast("Using approximate network location — tap the map to fine-tune your exact start point", 4800);
+    } else if (loc.source === "cache") {
+      showToast("Using last saved GPS location", 3500);
+    }
+
+    if (!loc.label) {
+      try {
+        const resp = await fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`);
+        if (resp.ok) {
+          const geo = await resp.json();
+          if (geo.name) {
+            if (geocodeSeq !== state.originGeocodeSeq || !state.liveStart) return;
+            state.liveStart.name = geo.name;
+            dom.liveStartInput.value = geo.name;
+            renderPendingLivePins();
+          }
+        }
+      } catch {
+        // keep coordinate label
+      }
+    }
+
+    if (state.liveGoal) await computeRoute({ flyToRoute: true });
+    else setLoading(false);
   });
 
   // Offline GPS Location (with Last GPS Fix Fallback)
@@ -2235,45 +2331,20 @@
     clearActiveRouteDisplay({ keepGraphEdges: true });
   });
 
-  dom.offlineGeoLocateBtn.addEventListener("click", () => {
-    const useCachedFallback = () => {
-      try {
-        const raw = localStorage.getItem(LAST_GPS_KEY);
-        if (raw) {
-          const cached = JSON.parse(raw);
-          if (typeof cached.lat === "number" && typeof cached.lng === "number") {
-            applyOfflineGpsOrigin(cached.lat, cached.lng, "My Location (Last GPS Fix)");
-            return true;
-          }
-        }
-      } catch {
-        // ignore storage parse error
-      }
-      return false;
-    };
-
-    if (!navigator.geolocation) {
-      if (!useCachedFallback()) showNotice("GPS is unavailable offline with no cached fix.");
+  dom.offlineGeoLocateBtn.addEventListener("click", async () => {
+    setLoading(true, "Acquiring offline GPS fix…");
+    const loc = await resolveUserLocation({ allowApproximate: true, buttonEl: dom.offlineGeoLocateBtn });
+    setLoading(false);
+    if (loc.error) {
+      showNotice(`${loc.error} Select an intersection manually.`);
       return;
     }
-
-    setLoading(true, "Acquiring offline GPS fix…");
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLoading(false);
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        localStorage.setItem(LAST_GPS_KEY, JSON.stringify({ lat, lng, timestamp: Date.now() }));
-        applyOfflineGpsOrigin(lat, lng, "My Location");
-      },
-      (err) => {
-        setLoading(false);
-        if (!useCachedFallback()) {
-          showNotice(`GPS unavailable (${err.message}). Select an intersection manually.`);
-        }
-      },
-      { enableHighAccuracy: true, timeout: 6000, maximumAge: 60000 }
-    );
+    applyOfflineGpsOrigin(loc.lat, loc.lng, loc.label || "My Location");
+    if (loc.source === "ip") {
+      showToast("Using approximate network location — tap the map to fine-tune your exact start point", 4500);
+    } else if (loc.source === "cache") {
+      showToast("Using last saved GPS location", 3500);
+    }
   });
 
   dom.swapWaypointsBtn.addEventListener("click", () => {
@@ -2994,7 +3065,9 @@
       navigator.geolocation.clearWatch(journey.watchId);
     }
 
-    const onGpsError = () => {
+    let retriedLowAcc = false;
+
+    const showSimPrompt = () => {
       if (journey.active && !journey.simulating) {
         const tipEl = document.getElementById("journeyGpsFallbackText");
         if (tipEl) {
@@ -3002,6 +3075,23 @@
         }
         dom.journeyGpsFallback.classList.remove("hidden");
       }
+    };
+
+    const onGpsError = (err) => {
+      if (!journey.active || journey.simulating) return;
+      if (err && err.code === 3 && !retriedLowAcc) {
+        retriedLowAcc = true;
+        if (journey.watchId !== null) {
+          navigator.geolocation.clearWatch(journey.watchId);
+        }
+        journey.watchId = navigator.geolocation.watchPosition(
+          handleIncomingLiveGps,
+          showSimPrompt,
+          { enableHighAccuracy: false, maximumAge: 300000, timeout: 6000 }
+        );
+        return;
+      }
+      showSimPrompt();
     };
 
     journey.watchId = navigator.geolocation.watchPosition(
@@ -3014,8 +3104,8 @@
     journey.gpsPollTimer = setInterval(() => {
       if (!journey.active || journey.simulating || journey.arrived) return;
       navigator.geolocation.getCurrentPosition(handleIncomingLiveGps, () => undefined, {
-        enableHighAccuracy: true,
-        maximumAge: 0,
+        enableHighAccuracy: !retriedLowAcc,
+        maximumAge: retriedLowAcc ? 300000 : 0,
         timeout: 5000,
       });
     }, 2500);
