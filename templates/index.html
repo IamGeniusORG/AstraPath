@@ -30,6 +30,41 @@
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body class="basemap-light">
+  <!-- Startup Splash Screen (Removed automatically once map/offline ready) -->
+  <div id="app-splash" class="app-splash" aria-label="Loading AstraPath" role="status">
+    <script>
+      try {
+        if (localStorage.getItem("astrapath_theme") === "dark" || localStorage.getItem("astrapath_basemap") === "dark") {
+          document.getElementById("app-splash").classList.add("is-dark");
+        }
+      } catch (e) {}
+      setTimeout(function () {
+        var el = document.getElementById("app-splash");
+        if (el) el.remove();
+      }, 3000);
+    </script>
+    <div class="splash-lockup">
+      <div class="splash-emblem" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+          <path d="M18 44L30 28L46 38" stroke="#93C5FD" stroke-opacity="0.45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18 44L22 20L46 18" stroke="#93C5FD" stroke-opacity="0.45" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18 44C24 44 26 30 34 26C40 23 44 20 46 18" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+          <circle cx="18" cy="44" r="4.5" fill="#16A34A" stroke="#FFFFFF" stroke-width="2"/>
+          <circle cx="30" cy="28" r="2.8" fill="#BFDBFE"/>
+          <circle cx="46" cy="38" r="2.8" fill="#BFDBFE"/>
+          <path d="M46 11L47.9 16.1L53 18L47.9 19.9L46 25L44.1 19.9L39 18L44.1 16.1L46 11Z" fill="#FFFFFF"/>
+        </svg>
+      </div>
+      <span class="splash-wordmark">AstraPath</span>
+    </div>
+    <div class="splash-dots" aria-hidden="true">
+      <span class="splash-dot splash-dot-blue"></span>
+      <span class="splash-dot splash-dot-red"></span>
+      <span class="splash-dot splash-dot-amber"></span>
+      <span class="splash-dot splash-dot-green"></span>
+    </div>
+  </div>
+
   <!-- Full-Bleed Map Canvas -->
   <div id="map" aria-label="Interactive road network map"></div>
 

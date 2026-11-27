@@ -3243,12 +3243,45 @@
   });
 
   // Boot Application in Clean Empty Startup State + Check Connectivity
+  const splashEl = document.getElementById("app-splash");
+  let splashMinElapsed = false;
+  let splashAppReady = false;
+  let splashDismissed = false;
+
+  function dismissSplash() {
+    if (splashDismissed || !splashEl) return;
+    if (!splashMinElapsed || !splashAppReady) return;
+    splashDismissed = true;
+    splashEl.classList.add("is-hidden");
+    const removeEl = () => {
+      if (splashEl.parentNode) splashEl.remove();
+    };
+    splashEl.addEventListener("transitionend", removeEl, { once: true });
+    setTimeout(removeEl, 350);
+  }
+
+  function markSplashReady() {
+    if (splashAppReady) return;
+    splashAppReady = true;
+    dismissSplash();
+  }
+
+  setTimeout(() => {
+    splashMinElapsed = true;
+    dismissSplash();
+  }, 850);
+
+  setTimeout(markSplashReady, 1500);
+  baseLayers.osm.once("load", markSplashReady);
+
   dom.liveStartInput.value = "";
   dom.liveGoalInput.value = "";
   updateVehicleButtonsUI();
   updateLiveActionIcons();
   updatePickHint();
-  probeConnectivity({ isInitial: true });
+  probeConnectivity({ isInitial: true }).finally(() => {
+    if (state.sourceMode === "offline") markSplashReady();
+  });
   syncOfflineBundleInBackground();
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/sw.js").catch(() => undefined);
