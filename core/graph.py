@@ -66,6 +66,8 @@ class RoadEdge:
     blocked: bool = False
     id: str = ""
     geometry: list[list[float]] = field(default_factory=list)
+    segment_type: str = "road"
+    highway_type: str = ""
 
     def __post_init__(self) -> None:
         if not self.id:
@@ -109,6 +111,8 @@ class RoadEdge:
             "bidirectional": self.bidirectional,
             "blocked": self.blocked,
             "geometry": self.geometry,
+            "segment_type": self.segment_type,
+            "highway_type": self.highway_type,
         }
 
 
@@ -163,6 +167,8 @@ class CityGraph:
                     blocked=edge.blocked,
                     id=edge.id,
                     geometry=reverse_geom,
+                    segment_type=edge.segment_type,
+                    highway_type=edge.highway_type,
                 )
                 self.adj[edge.target].append(reverse_edge)
                 self._directed_lookup[reverse_edge.edge_key] = reverse_edge
@@ -209,6 +215,9 @@ class CityGraph:
                 traffic_weight=float(item.get("traffic_weight", MIN_TRAFFIC_WEIGHT)),
                 bidirectional=bool(item.get("bidirectional", True)),
                 blocked=bool(item.get("blocked", False)),
+                geometry=list(item.get("geometry") or []),
+                segment_type=str(item.get("segment_type", "road")),
+                highway_type=str(item.get("highway_type", "road")),
             )
             raw_edges.append(edge)
 
@@ -234,19 +243,24 @@ class CityGraph:
         edge: RoadEdge,
         mode: str,
         traffic_weight: float | None = None,
+        vehicle: str = "car",
     ) -> float:
-        """Compute edge traversal cost g-step according to routing mode.
-
-        Args:
-            edge: Directed road segment being traversed.
-            mode: 'shortest' (km) or 'fastest' (minutes).
-            traffic_weight: Optional traffic multiplier override (>= 1.0).
-        """
-        if mode == "shortest":
-            return edge.distance_km
-        if mode == "fastest":
+        """Compute edge traversal cost g-step according to routing mode and vehicle."""
+        if mode not in VALID_MODES:
+            raise ValueError(f"Invalid routing mode '{mode}'. Expected one of {VALID_MODES}.")
+        if vehicle == "car":
+            if mode == "shortest":
+                return edge.distance_km
             return edge.travel_time_min(traffic_weight)
-        raise ValueError(f"Invalid routing mode '{mode}'. Expected one of {VALID_MODES}.")
+
+        from core.modes import compute_vehicle_edge_cost
+
+        return compute_vehicle_edge_cost(
+            edge=edge,
+            mode=mode,
+            vehicle=vehicle,
+            traffic_weight=traffic_weight,
+        )
 
     def validate_admissibility(self) -> list[str]:
         """Validate graph invariants required for admissible A* heuristics.

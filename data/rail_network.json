@@ -1,0 +1,590 @@
+{
+  "network": "Indian & Bengal Rail",
+  "max_speed_kmph": 90,
+  "stations": [
+    {
+      "id": "R_KYI",
+      "name": "Kalyani",
+      "lat": 22.9742,
+      "lng": 88.448
+    },
+    {
+      "id": "R_KPA",
+      "name": "Kanchrapara",
+      "lat": 22.9445,
+      "lng": 88.4316
+    },
+    {
+      "id": "R_NH",
+      "name": "Naihati",
+      "lat": 22.8931,
+      "lng": 88.4218
+    },
+    {
+      "id": "R_BP",
+      "name": "Barrackpore",
+      "lat": 22.7604,
+      "lng": 88.3712
+    },
+    {
+      "id": "R_DDJ",
+      "name": "Dum Dum Jn",
+      "lat": 22.6214,
+      "lng": 88.3931
+    },
+    {
+      "id": "R_SDAH",
+      "name": "Sealdah",
+      "lat": 22.5677,
+      "lng": 88.3712
+    },
+    {
+      "id": "R_HWH",
+      "name": "Howrah Jn",
+      "lat": 22.5839,
+      "lng": 88.3426
+    },
+    {
+      "id": "R_BDC",
+      "name": "Bandel Jn",
+      "lat": 22.9242,
+      "lng": 88.3778
+    },
+    {
+      "id": "R_KNJ",
+      "name": "Krishnanagar City",
+      "lat": 23.4015,
+      "lng": 88.4998
+    },
+    {
+      "id": "R_RHA",
+      "name": "Ranaghat Jn",
+      "lat": 23.1782,
+      "lng": 88.5665
+    },
+    {
+      "id": "R_BWN",
+      "name": "Barddhaman (Burdwan)",
+      "lat": 23.2504,
+      "lng": 87.8705
+    },
+    {
+      "id": "R_DGR",
+      "name": "Durgapur",
+      "lat": 23.4945,
+      "lng": 87.3168
+    },
+    {
+      "id": "R_ASN",
+      "name": "Asansol Jn",
+      "lat": 23.6915,
+      "lng": 86.9744
+    },
+    {
+      "id": "R_KGP",
+      "name": "Kharagpur Jn",
+      "lat": 22.3396,
+      "lng": 87.3248
+    },
+    {
+      "id": "R_NJP",
+      "name": "New Jalpaiguri (Siliguri)",
+      "lat": 26.6836,
+      "lng": 88.4418
+    },
+    {
+      "id": "R_MLDT",
+      "name": "Malda Town",
+      "lat": 25.0021,
+      "lng": 88.1404
+    },
+    {
+      "id": "R_PNBE",
+      "name": "Patna Jn",
+      "lat": 25.6033,
+      "lng": 85.1376
+    },
+    {
+      "id": "R_GAYA",
+      "name": "Gaya Jn",
+      "lat": 24.8035,
+      "lng": 84.9994
+    },
+    {
+      "id": "R_RNC",
+      "name": "Ranchi",
+      "lat": 23.3502,
+      "lng": 85.3435
+    },
+    {
+      "id": "R_BBS",
+      "name": "Bhubaneswar",
+      "lat": 20.2665,
+      "lng": 85.8436
+    },
+    {
+      "id": "R_CTC",
+      "name": "Cuttack",
+      "lat": 20.4648,
+      "lng": 85.8993
+    },
+    {
+      "id": "R_PURI",
+      "name": "Puri",
+      "lat": 19.8077,
+      "lng": 85.839
+    },
+    {
+      "id": "R_GHY",
+      "name": "Guwahati",
+      "lat": 26.182,
+      "lng": 91.751
+    },
+    {
+      "id": "R_NDLS",
+      "name": "New Delhi",
+      "lat": 28.6429,
+      "lng": 77.2191
+    },
+    {
+      "id": "R_CSMT",
+      "name": "Mumbai CSMT",
+      "lat": 18.9398,
+      "lng": 72.8355
+    },
+    {
+      "id": "R_SBC",
+      "name": "KSR Bengaluru",
+      "lat": 12.9784,
+      "lng": 77.5715
+    },
+    {
+      "id": "R_MAS",
+      "name": "Chennai Central",
+      "lat": 13.0827,
+      "lng": 80.275
+    },
+    {
+      "id": "R_SC",
+      "name": "Secunderabad",
+      "lat": 17.4344,
+      "lng": 78.5013
+    },
+    {
+      "id": "R_ADI",
+      "name": "Ahmedabad Jn",
+      "lat": 23.0268,
+      "lng": 72.6009
+    },
+    {
+      "id": "R_JP",
+      "name": "Jaipur Jn",
+      "lat": 26.9196,
+      "lng": 75.7878
+    },
+    {
+      "id": "R_LKO",
+      "name": "Lucknow Charbagh",
+      "lat": 26.8318,
+      "lng": 80.9206
+    },
+    {
+      "id": "R_BSB",
+      "name": "Varanasi Jn",
+      "lat": 25.327,
+      "lng": 82.9866
+    }
+  ],
+  "edges": [
+    {
+      "from": "R_KYI",
+      "to": "R_KPA",
+      "road_name": "Rail: Kalyani - Kanchrapara",
+      "distance_km": 4.149,
+      "speed_limit_kmph": 55,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_KPA",
+      "to": "R_NH",
+      "road_name": "Rail: Kanchrapara - Naihati",
+      "distance_km": 6.499,
+      "speed_limit_kmph": 55,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_NH",
+      "to": "R_BP",
+      "road_name": "Rail: Naihati - Barrackpore",
+      "distance_km": 17.517,
+      "speed_limit_kmph": 60,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_BP",
+      "to": "R_DDJ",
+      "road_name": "Rail: Barrackpore - Dum Dum Jn",
+      "distance_km": 17.493,
+      "speed_limit_kmph": 60,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_DDJ",
+      "to": "R_SDAH",
+      "road_name": "Rail: Dum Dum Jn - Sealdah",
+      "distance_km": 7.146,
+      "speed_limit_kmph": 55,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_SDAH",
+      "to": "R_HWH",
+      "road_name": "Rail: Sealdah - Howrah Jn",
+      "distance_km": 3.858,
+      "speed_limit_kmph": 45,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_KYI",
+      "to": "R_RHA",
+      "road_name": "Rail: Kalyani - Ranaghat Jn",
+      "distance_km": 28.806,
+      "speed_limit_kmph": 60,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_RHA",
+      "to": "R_KNJ",
+      "road_name": "Rail: Ranaghat Jn - Krishnanagar City",
+      "distance_km": 28.837,
+      "speed_limit_kmph": 60,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_NH",
+      "to": "R_BDC",
+      "road_name": "Rail: Naihati - Bandel Jn",
+      "distance_km": 6.362,
+      "speed_limit_kmph": 55,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_HWH",
+      "to": "R_BDC",
+      "road_name": "Rail: Howrah Jn - Bandel Jn",
+      "distance_km": 42.573,
+      "speed_limit_kmph": 70,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_BDC",
+      "to": "R_BWN",
+      "road_name": "Rail: Bandel Jn - Barddhaman (Burdwan)",
+      "distance_km": 70.909,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_BWN",
+      "to": "R_DGR",
+      "road_name": "Rail: Barddhaman (Burdwan) - Durgapur",
+      "distance_km": 70.22,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_DGR",
+      "to": "R_ASN",
+      "road_name": "Rail: Durgapur - Asansol Jn",
+      "distance_km": 46.141,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_HWH",
+      "to": "R_KGP",
+      "road_name": "Rail: Howrah Jn - Kharagpur Jn",
+      "distance_km": 121.025,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_KGP",
+      "to": "R_CTC",
+      "road_name": "Rail: Kharagpur Jn - Cuttack",
+      "distance_km": 286.061,
+      "speed_limit_kmph": 85,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_CTC",
+      "to": "R_BBS",
+      "road_name": "Rail: Cuttack - Bhubaneswar",
+      "distance_km": 25.538,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_BBS",
+      "to": "R_PURI",
+      "road_name": "Rail: Bhubaneswar - Puri",
+      "distance_km": 57.141,
+      "speed_limit_kmph": 65,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_BWN",
+      "to": "R_MLDT",
+      "road_name": "Rail: Barddhaman (Burdwan) - Malda Town",
+      "distance_km": 220.3,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_MLDT",
+      "to": "R_NJP",
+      "road_name": "Rail: Malda Town - New Jalpaiguri (Siliguri)",
+      "distance_km": 212.118,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_NJP",
+      "to": "R_GHY",
+      "road_name": "Rail: New Jalpaiguri (Siliguri) - Guwahati",
+      "distance_km": 374.275,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_ASN",
+      "to": "R_GAYA",
+      "road_name": "Rail: Asansol Jn - Gaya Jn",
+      "distance_km": 263.571,
+      "speed_limit_kmph": 85,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_GAYA",
+      "to": "R_PNBE",
+      "road_name": "Rail: Gaya Jn - Patna Jn",
+      "distance_km": 100.816,
+      "speed_limit_kmph": 70,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_ASN",
+      "to": "R_RNC",
+      "road_name": "Rail: Asansol Jn - Ranchi",
+      "distance_km": 191.022,
+      "speed_limit_kmph": 70,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_KGP",
+      "to": "R_RNC",
+      "road_name": "Rail: Kharagpur Jn - Ranchi",
+      "distance_km": 259.894,
+      "speed_limit_kmph": 70,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_PNBE",
+      "to": "R_BSB",
+      "road_name": "Rail: Patna Jn - Varanasi Jn",
+      "distance_km": 244.289,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_GAYA",
+      "to": "R_BSB",
+      "road_name": "Rail: Gaya Jn - Varanasi Jn",
+      "distance_km": 236.235,
+      "speed_limit_kmph": 85,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_BSB",
+      "to": "R_LKO",
+      "road_name": "Rail: Varanasi Jn - Lucknow Charbagh",
+      "distance_km": 297.526,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_LKO",
+      "to": "R_NDLS",
+      "road_name": "Rail: Lucknow Charbagh - New Delhi",
+      "distance_km": 466.161,
+      "speed_limit_kmph": 85,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_NDLS",
+      "to": "R_JP",
+      "road_name": "Rail: New Delhi - Jaipur Jn",
+      "distance_km": 266.322,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_JP",
+      "to": "R_ADI",
+      "road_name": "Rail: Jaipur Jn - Ahmedabad Jn",
+      "distance_km": 603.647,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_ADI",
+      "to": "R_CSMT",
+      "road_name": "Rail: Ahmedabad Jn - Mumbai CSMT",
+      "distance_km": 509.718,
+      "speed_limit_kmph": 85,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_CSMT",
+      "to": "R_SC",
+      "road_name": "Rail: Mumbai CSMT - Secunderabad",
+      "distance_km": 696.031,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_BBS",
+      "to": "R_SC",
+      "road_name": "Rail: Bhubaneswar - Secunderabad",
+      "distance_km": 934.305,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_SC",
+      "to": "R_SBC",
+      "road_name": "Rail: Secunderabad - KSR Bengaluru",
+      "distance_km": 566.074,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_SC",
+      "to": "R_MAS",
+      "road_name": "Rail: Secunderabad - Chennai Central",
+      "distance_km": 582.324,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_BBS",
+      "to": "R_MAS",
+      "road_name": "Rail: Bhubaneswar - Chennai Central",
+      "distance_km": 1114.002,
+      "speed_limit_kmph": 85,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_SBC",
+      "to": "R_MAS",
+      "road_name": "Rail: KSR Bengaluru - Chennai Central",
+      "distance_km": 328.275,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_KGP",
+      "to": "R_CSMT",
+      "road_name": "Rail: Kharagpur Jn - Mumbai CSMT",
+      "distance_km": 1740.038,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    },
+    {
+      "from": "R_RNC",
+      "to": "R_PNBE",
+      "road_name": "Rail: Ranchi - Patna Jn",
+      "distance_km": 281.566,
+      "speed_limit_kmph": 70,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "rail"
+    }
+  ]
+}

@@ -39,6 +39,9 @@
     <span id="loadingPillText">Finding optimal route…</span>
   </div>
 
+  <!-- Calm Non-Intrusive Connectivity / Action Toast -->
+  <div id="statusToast" class="status-toast hidden" role="status" aria-live="polite"></div>
+
   <!-- Top-Right Ultra-Slim Traffic Legend Pill -->
   <div class="traffic-legend-pill" aria-label="Traffic color legend">
     <span class="legend-item"><span class="legend-dot dot-smooth"></span>Smooth</span>
@@ -90,10 +93,9 @@
 
     <!-- Collapsible Card Body -->
     <div id="navCardBody" class="nav-card-body">
-      <!-- Unified Google Maps-Style Waypoint Box -->
       <div class="planner-section">
+        <!-- Unified Google Maps-Style Waypoint Box -->
         <div class="waypoint-box">
-          <!-- Left Vertical Route Rail -->
           <div class="route-rail" aria-hidden="true">
             <span class="rail-origin-dot"></span>
             <span class="rail-connector"></span>
@@ -112,6 +114,11 @@
                 class="waypoint-input"
               />
               <div class="waypoint-inline-actions">
+                <button id="saveLiveStartBtn" type="button" class="inline-icon-btn hidden" title="Save origin for offline routing" aria-label="Save origin for offline routing">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </button>
                 <button id="clearStartBtn" type="button" class="inline-icon-btn hidden" title="Clear starting location" aria-label="Clear starting location">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -147,6 +154,11 @@
                 class="waypoint-input"
               />
               <div class="waypoint-inline-actions">
+                <button id="saveLiveGoalBtn" type="button" class="inline-icon-btn hidden" title="Save destination for offline routing" aria-label="Save destination for offline routing">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </button>
                 <button id="clearGoalBtn" type="button" class="inline-icon-btn hidden" title="Clear destination" aria-label="Clear destination">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -164,10 +176,25 @@
             </div>
           </div>
 
-          <!-- Waypoint Selects (Offline Backup Mode) -->
+          <!-- Waypoint Selects (Offline Mode + Live GPS Origin Button) -->
           <div id="offlineSelectControls" class="waypoint-fields hidden">
             <div class="waypoint-row">
               <select id="startSelect" class="waypoint-select" aria-label="Offline origin intersection"></select>
+              <div class="waypoint-inline-actions">
+                <button id="clearOfflineOriginBtn" type="button" class="inline-icon-btn hidden" title="Clear GPS origin" aria-label="Clear GPS origin">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+                <button id="offlineGeoLocateBtn" type="button" class="inline-icon-btn" title="Use my GPS location offline" aria-label="Use my GPS location offline">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+                    <circle cx="12" cy="12" r="7"></circle>
+                  </svg>
+                </button>
+              </div>
             </div>
             <div class="waypoint-divider"></div>
             <div class="waypoint-row">
@@ -175,7 +202,7 @@
             </div>
           </div>
 
-          <!-- Circular Swap Button on Right Divider Edge -->
+          <!-- Circular Swap Button inside Right Padding -->
           <button id="swapWaypointsBtn" type="button" class="swap-circle-btn" title="Swap origin and destination" aria-label="Swap origin and destination">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"></path>
@@ -183,15 +210,126 @@
           </button>
         </div>
 
+        <!-- Multi-Modal Vehicle Selector Strip (6 Modes + Live ETA Badges) -->
+        <div class="vehicle-strip" role="tablist" aria-label="Travel mode">
+          <button type="button" data-vehicle="car" class="vehicle-btn is-active" title="Driving (Car)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-2.3-4.6c-.4-.8-1.2-1.4-2.1-1.4H8.4c-.9 0-1.7.6-2.1 1.4L4 10l-2.5 1.1C.7 11.3 0 12.1 0 13v3c0 .6.4 1 1 1h2"></path>
+              <circle cx="7" cy="17" r="2"></circle>
+              <circle cx="17" cy="17" r="2"></circle>
+            </svg>
+            <span class="vehicle-eta num" data-eta-for="car">--</span>
+          </button>
+          <button type="button" data-vehicle="bike" class="vehicle-btn" title="Two-Wheeler (Bike)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5.5" cy="17.5" r="3.5"></circle>
+              <circle cx="18.5" cy="17.5" r="3.5"></circle>
+              <path d="M15 6h3l2 5.5"></path>
+              <path d="M6 14h6l4-5"></path>
+              <path d="M12 14l-1.5-4H8"></path>
+            </svg>
+            <span class="vehicle-eta num" data-eta-for="bike">--</span>
+          </button>
+          <button type="button" data-vehicle="cycle" class="vehicle-btn" title="Bicycle (Cycle)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5.5" cy="17.5" r="3.5"></circle>
+              <circle cx="18.5" cy="17.5" r="3.5"></circle>
+              <circle cx="15" cy="5" r="1"></circle>
+              <path d="M12 17.5V14l-3-3 4-3 2 3h2"></path>
+            </svg>
+            <span class="vehicle-eta num" data-eta-for="cycle">--</span>
+          </button>
+          <button type="button" data-vehicle="walk" class="vehicle-btn" title="Walking">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="13" cy="4" r="2"></circle>
+              <path d="M10 22l2-7 3 2v5"></path>
+              <path d="M7 13l3-4 4 1 3 3"></path>
+              <path d="M11 10l-1 6-3 4"></path>
+            </svg>
+            <span class="vehicle-eta num" data-eta-for="walk">--</span>
+          </button>
+          <button type="button" data-vehicle="train" class="vehicle-btn" title="Rail Transit (Train)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="3" width="16" height="15" rx="3"></rect>
+              <path d="M4 11h16"></path>
+              <path d="M12 3v8"></path>
+              <path d="M8 19l-2 3"></path>
+              <path d="M16 19l2 3"></path>
+              <circle cx="8.5" cy="14.5" r="1"></circle>
+              <circle cx="15.5" cy="14.5" r="1"></circle>
+            </svg>
+            <span class="vehicle-eta num" data-eta-for="train">--</span>
+          </button>
+          <button type="button" data-vehicle="flight" class="vehicle-btn" title="Air Travel (Flight)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path>
+            </svg>
+            <span class="vehicle-eta num" data-eta-for="flight">--</span>
+          </button>
+        </div>
+
         <!-- Action Row: Fastest/Shortest Segmented Control + Calculate Button -->
         <div class="action-row">
-          <div class="segmented-pill mode-segmented" role="group" aria-label="Routing objective">
+          <div id="modeSegmented" class="segmented-pill mode-segmented" role="group" aria-label="Routing objective">
             <button type="button" data-mode="fastest" class="mode-btn is-active">Fastest</button>
             <button type="button" data-mode="shortest" class="mode-btn">Shortest</button>
           </div>
           <button id="findRouteBtn" type="button" class="primary-btn">
             Calculate
           </button>
+        </div>
+
+        <!-- Offline Custom Places Panel (Shown in Offline Mode) -->
+        <div id="offlinePlacesPanel" class="offline-places-panel hidden">
+          <div class="offline-places-header">
+            <button id="toggleSaveOfflineBtn" type="button" class="save-toggle-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Save Place for Offline</span>
+            </button>
+            <span id="savedCountBadge" class="saved-count-badge num">0 saved</span>
+          </div>
+
+          <div id="savePlaceForm" class="save-place-form hidden">
+            <div id="saveOnlineSearchWrap" class="save-search-wrap">
+              <input
+                id="savePlaceSearchInput"
+                type="text"
+                autocomplete="off"
+                placeholder="Search any place to save..."
+                class="save-input"
+              />
+              <button id="savePlacePickMapBtn" type="button" class="inline-icon-btn" title="Pick point on map" aria-label="Pick point on map">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </button>
+              <div id="savePlaceSearchResults" class="autocomplete-menu hidden"></div>
+            </div>
+            <div id="saveOfflineHint" class="subtle-hint hidden">
+              Connect to internet to search &amp; save new places — you can still tap the map to save a pin locally
+            </div>
+            <div class="save-label-row">
+              <input
+                id="savePlaceNameInput"
+                type="text"
+                maxlength="80"
+                placeholder="Label (e.g., Home, Campus)..."
+                class="save-input"
+              />
+              <button id="savePlaceConfirmBtn" type="button" class="secondary-btn">Save Offline</button>
+            </div>
+          </div>
+
+          <ul id="savedPlacesList" class="saved-places-list hidden"></ul>
+
+          <div id="savedRoutesSection" class="saved-routes-section hidden">
+            <div class="saved-routes-title">Saved Offline Routes</div>
+            <ul id="savedRoutesList" class="saved-places-list"></ul>
+          </div>
         </div>
 
         <!-- Map-Pick Hint & Inline Notice Banner -->
@@ -211,11 +349,20 @@
             <div class="hero-tags">
               <span id="graphSourcePill" class="source-tag">Live OSM</span>
               <span id="longDistancePill" class="notice-tag hidden">Highway mode</span>
+              <button id="saveRouteOfflineBtn" type="button" class="save-route-pill hidden" title="Save this route for offline viewing">
+                Save Offline
+              </button>
             </div>
           </div>
           <div id="heroAlgoSummary" class="hero-algo-summary num hidden">
             A*: -- nodes (-- ms)
           </div>
+          <button id="startJourneyBtn" type="button" class="start-journey-btn hidden">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+            </svg>
+            <span>Start Journey</span>
+          </button>
         </div>
 
         <!-- 3-Tab Strip -->
@@ -227,12 +374,10 @@
 
         <!-- Tab Panels -->
         <div class="tab-panels">
-          <!-- Tab 1: Directions -->
           <section id="tabDirections" class="tab-panel" role="tabpanel">
             <ol id="itineraryList" class="directions-list"></ol>
           </section>
 
-          <!-- Tab 2: Algorithm -->
           <section id="tabAlgorithm" class="tab-panel hidden" role="tabpanel">
             <div class="algo-summary-row">
               <span id="graphScaleText" class="graph-scale-text num">-- intersections &middot; -- roads</span>
@@ -280,7 +425,6 @@
             </div>
           </section>
 
-          <!-- Tab 3: Traffic -->
           <section id="tabTraffic" class="tab-panel hidden" role="tabpanel">
             <div class="preset-strip" role="group" aria-label="Traffic presets">
               <button type="button" data-preset="normal" class="preset-pill is-active">Normal</button>
@@ -319,20 +463,75 @@
     </div>
   </aside>
 
-  <!-- Bottom-Right Map Controls: Graph Toggle + Basemap Switcher + Zoom/Recenter Stack -->
-  <div class="map-controls-br">
-    <button id="graphOverlayBtn" type="button" class="overlay-toggle-pill is-active" aria-pressed="true" title="Toggle road network and junctions">
-      <span class="overlay-dot" aria-hidden="true"></span>
-      <span>Graph</span>
+  <!-- Bottom-Left Google Maps-Style Layers Thumbnail & Popover -->
+  <div class="layers-widget" id="layersWidget">
+    <button
+      id="layersTriggerBtn"
+      type="button"
+      class="layers-trigger"
+      aria-expanded="false"
+      aria-controls="layersPopover"
+      title="Map layers and style"
+    >
+      <span id="layersTriggerPreview" class="layers-preview preview-satellite" aria-hidden="true"></span>
+      <span class="layers-trigger-bar">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span>Layers</span>
+      </span>
     </button>
 
-    <div class="basemap-switcher" role="group" aria-label="Map style">
-      <button type="button" data-basemap="light" class="basemap-btn is-active">Map</button>
-      <button type="button" data-basemap="dark" class="basemap-btn">Dark</button>
-      <button type="button" data-basemap="satellite" class="basemap-btn">Satellite</button>
-    </div>
+    <div id="layersPopover" class="layers-popover hidden" role="dialog" aria-label="Map layers">
+      <div class="popover-section">
+        <div class="popover-title">Map type</div>
+        <div class="map-type-grid">
+          <button type="button" data-basemap="light" class="map-type-card is-active">
+            <span class="type-thumb preview-default" aria-hidden="true"></span>
+            <span class="type-label">Default</span>
+          </button>
+          <button type="button" data-basemap="dark" class="map-type-card">
+            <span class="type-thumb preview-dark" aria-hidden="true"></span>
+            <span class="type-label">Dark</span>
+          </button>
+          <button type="button" data-basemap="satellite" class="map-type-card">
+            <span class="type-thumb preview-satellite" aria-hidden="true"></span>
+            <span class="type-label">Satellite</span>
+          </button>
+        </div>
+      </div>
 
+      <div class="popover-divider"></div>
+
+      <div class="popover-section">
+        <div class="popover-title">Map details</div>
+        <div class="popover-toggles">
+          <label class="switch-row">
+            <input id="graphOverlayToggle" type="checkbox" checked class="toggle-input" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <span class="switch-label">Road Graph</span>
+          </label>
+          <label class="switch-row">
+            <input id="hybridLabelsToggle" type="checkbox" checked class="toggle-input" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <span class="switch-label">Labels</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom-Right Clean Vertical Control Stack -->
+  <div class="map-controls-br">
     <div class="zoom-stack" role="group" aria-label="Map camera controls">
+      <button id="resetViewBtn" type="button" class="stack-btn" title="Recenter route" aria-label="Recenter route">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+        </svg>
+      </button>
       <button id="zoomInBtn" type="button" class="stack-btn" title="Zoom in" aria-label="Zoom in">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -344,15 +543,86 @@
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
       </button>
-      <button id="resetViewBtn" type="button" class="stack-btn" title="Recenter route" aria-label="Recenter route">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
-        </svg>
-      </button>
     </div>
   </div>
 
+  <!-- Active Journey Navigation HUD (Hidden until Start Journey) -->
+  <div id="journeyTopBanner" class="journey-top-banner hidden" role="region" aria-label="Turn-by-turn navigation">
+    <div class="journey-turn-badge" id="journeyTurnIcon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="19" x2="12" y2="5"></line>
+        <polyline points="5 12 12 5 19 12"></polyline>
+      </svg>
+    </div>
+    <div class="journey-banner-text">
+      <div class="journey-step-meta">
+        <span id="journeyStepDist" class="journey-step-dist num">0 m</span>
+        <span id="journeyStepAction" class="journey-step-action">Continue straight</span>
+      </div>
+      <div id="journeyStepRoad" class="journey-step-road">Loading route…</div>
+    </div>
+    <button id="journeyVoiceBtn" type="button" class="journey-voice-btn" title="Toggle voice guidance (Muted)" aria-label="Toggle voice guidance" aria-pressed="false">
+      <svg id="journeyVoiceIconMuted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <line x1="23" y1="9" x2="17" y2="15"></line>
+        <line x1="17" y1="9" x2="23" y2="15"></line>
+      </svg>
+      <svg id="journeyVoiceIconOn" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div id="journeyGpsFallback" class="journey-gps-fallback hidden" role="alert">
+    <span id="journeyGpsFallbackText">Live GPS unavailable on this device — switch to Simulate to preview live navigation.</span>
+    <button id="journeySwitchSimBtn" type="button" class="journey-sim-prompt-btn">Switch to Simulate</button>
+  </div>
+
+  <div id="journeyBottomBar" class="journey-bottom-bar hidden" role="region" aria-label="Journey telemetry">
+    <div class="journey-progress-track">
+      <div id="journeyProgressFill" class="journey-progress-fill" style="width: 0%"></div>
+    </div>
+    <div class="journey-bottom-content">
+      <div class="journey-telemetry">
+        <span id="journeyRemEta" class="journey-rem-eta num">-- min</span>
+        <span class="journey-sep">&middot;</span>
+        <span id="journeyRemDist" class="journey-rem-dist num">-- km</span>
+        <span class="journey-sep">&middot;</span>
+        <span id="journeySpeed" class="journey-speed num">0 km/h</span>
+      </div>
+      <div class="journey-actions">
+        <button id="journeyFollowBtn" type="button" class="journey-ctrl-btn is-active" title="Follow pointer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+          </svg>
+          <span id="journeyFollowLabel">Following</span>
+        </button>
+        <button id="journeySimToggleBtn" type="button" class="journey-ctrl-btn" title="Toggle Live GPS vs Simulate">
+          <span id="journeySimLabel">Live GPS</span>
+        </button>
+        <button id="journeySimSpeedBtn" type="button" class="journey-ctrl-btn hidden num" title="Cycle simulation speed">1x</button>
+        <button id="journeyEndBtn" type="button" class="journey-end-btn">End</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="journeyArrivalCard" class="journey-arrival-card hidden" role="dialog" aria-label="Journey complete">
+    <div class="journey-arrival-badge" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <div class="journey-arrival-body">
+      <div class="journey-arrival-title">You have arrived</div>
+      <div id="journeyArrivalSummary" class="journey-arrival-summary num">-- km &middot; -- min</div>
+    </div>
+    <button id="journeyDoneBtn" type="button" class="primary-btn">Done</button>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/offline_engine.js') }}"></script>
   <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 </body>
 </html>

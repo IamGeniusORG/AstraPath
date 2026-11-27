@@ -1,6 +1,6 @@
 {
   "city": "Kolkata Metro",
-  "max_speed_kmph": 60,
+  "max_speed_kmph": 80,
   "nodes": [
     {
       "id": "N1",
@@ -121,6 +121,78 @@
       "name": "Ruby Hospital (EM Bypass)",
       "lat": 22.5136,
       "lng": 88.4018
+    },
+    {
+      "id": "N21",
+      "name": "Kalyani City Center",
+      "lat": 22.9751,
+      "lng": 88.4345
+    },
+    {
+      "id": "N22",
+      "name": "Kalyani Expressway - Kampa More",
+      "lat": 22.951,
+      "lng": 88.458
+    },
+    {
+      "id": "N23",
+      "name": "Kanchrapara More",
+      "lat": 22.9445,
+      "lng": 88.4335
+    },
+    {
+      "id": "N24",
+      "name": "Naihati - Halisahar Junction",
+      "lat": 22.8925,
+      "lng": 88.422
+    },
+    {
+      "id": "N25",
+      "name": "Barrackpore Chiriamore",
+      "lat": 22.7674,
+      "lng": 88.37
+    },
+    {
+      "id": "N26",
+      "name": "Sodepur Traffic More",
+      "lat": 22.6995,
+      "lng": 88.3765
+    },
+    {
+      "id": "N27",
+      "name": "Dunlop Bridge",
+      "lat": 22.6535,
+      "lng": 88.3775
+    },
+    {
+      "id": "N28",
+      "name": "Belghoria Expressway - Nimta",
+      "lat": 22.6625,
+      "lng": 88.4045
+    },
+    {
+      "id": "N29",
+      "name": "Barasat Colony More",
+      "lat": 22.7225,
+      "lng": 88.481
+    },
+    {
+      "id": "N30",
+      "name": "Madhyamgram Chowmatha",
+      "lat": 22.6925,
+      "lng": 88.4655
+    },
+    {
+      "id": "N31",
+      "name": "Chakdaha More (NH-12)",
+      "lat": 23.076,
+      "lng": 88.518
+    },
+    {
+      "id": "N32",
+      "name": "Gayeshpur / Haringhata More",
+      "lat": 22.9585,
+      "lng": 88.498
     }
   ],
   "edges": [
@@ -523,6 +595,638 @@
       "traffic_weight": 1.2,
       "bidirectional": true,
       "blocked": false
+    },
+    {
+      "from": "N31",
+      "to": "N21",
+      "road_name": "Kalyani - Chakdaha Link Rd (NH-12)",
+      "distance_km": 14.385,
+      "speed_limit_kmph": 70,
+      "traffic_weight": 1.1,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          23.076,
+          88.518
+        ],
+        [
+          23.048,
+          88.492
+        ],
+        [
+          23.019,
+          88.467
+        ],
+        [
+          22.993,
+          88.448
+        ],
+        [
+          22.9751,
+          88.4345
+        ]
+      ]
+    },
+    {
+      "from": "N31",
+      "to": "N32",
+      "road_name": "NH-12 (Kalyani-Chakdaha Corridor)",
+      "distance_km": 13.489,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.05,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          23.076,
+          88.518
+        ],
+        [
+          23.042,
+          88.513
+        ],
+        [
+          23.005,
+          88.506
+        ],
+        [
+          22.981,
+          88.502
+        ],
+        [
+          22.9585,
+          88.498
+        ]
+      ]
+    },
+    {
+      "from": "N21",
+      "to": "N32",
+      "road_name": "Kalyani - Gayeshpur Rd",
+      "distance_km": 6.893,
+      "speed_limit_kmph": 55,
+      "traffic_weight": 1.15,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.9751,
+          88.4345
+        ],
+        [
+          22.971,
+          88.458
+        ],
+        [
+          22.965,
+          88.479
+        ],
+        [
+          22.9585,
+          88.498
+        ]
+      ]
+    },
+    {
+      "from": "N21",
+      "to": "N23",
+      "road_name": "Kalyani - Kanchrapara Station Rd",
+      "distance_km": 3.472,
+      "speed_limit_kmph": 45,
+      "traffic_weight": 1.3,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.9751,
+          88.4345
+        ],
+        [
+          22.963,
+          88.434
+        ],
+        [
+          22.9535,
+          88.4338
+        ],
+        [
+          22.9445,
+          88.4335
+        ]
+      ]
+    },
+    {
+      "from": "N21",
+      "to": "N22",
+      "road_name": "Kalyani Expressway (North)",
+      "distance_km": 3.673,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.08,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.9751,
+          88.4345
+        ],
+        [
+          22.9685,
+          88.4445
+        ],
+        [
+          22.9595,
+          88.4525
+        ],
+        [
+          22.951,
+          88.458
+        ]
+      ]
+    },
+    {
+      "from": "N32",
+      "to": "N22",
+      "road_name": "Kampa - Haringhata Connector (SH-1)",
+      "distance_km": 4.263,
+      "speed_limit_kmph": 65,
+      "traffic_weight": 1.1,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.9585,
+          88.498
+        ],
+        [
+          22.9555,
+          88.482
+        ],
+        [
+          22.953,
+          88.47
+        ],
+        [
+          22.951,
+          88.458
+        ]
+      ]
+    },
+    {
+      "from": "N22",
+      "to": "N23",
+      "road_name": "Kampa More - Kanchrapara Link",
+      "distance_km": 2.663,
+      "speed_limit_kmph": 50,
+      "traffic_weight": 1.2,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.951,
+          88.458
+        ],
+        [
+          22.9485,
+          88.4495
+        ],
+        [
+          22.946,
+          88.441
+        ],
+        [
+          22.9445,
+          88.4335
+        ]
+      ]
+    },
+    {
+      "from": "N23",
+      "to": "N24",
+      "road_name": "Ghoshpara Rd (Kanchrapara - Naihati)",
+      "distance_km": 6.019,
+      "speed_limit_kmph": 45,
+      "traffic_weight": 1.35,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.9445,
+          88.4335
+        ],
+        [
+          22.927,
+          88.4285
+        ],
+        [
+          22.909,
+          88.4245
+        ],
+        [
+          22.8925,
+          88.422
+        ]
+      ]
+    },
+    {
+      "from": "N22",
+      "to": "N24",
+      "road_name": "Kalyani Expressway (Kampa - Naihati)",
+      "distance_km": 7.627,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.08,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.951,
+          88.458
+        ],
+        [
+          22.931,
+          88.451
+        ],
+        [
+          22.911,
+          88.439
+        ],
+        [
+          22.8925,
+          88.422
+        ]
+      ]
+    },
+    {
+      "from": "N24",
+      "to": "N25",
+      "road_name": "Kalyani Expy / BT Rd (Naihati - Barrackpore)",
+      "distance_km": 15.194,
+      "speed_limit_kmph": 70,
+      "traffic_weight": 1.18,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.8925,
+          88.422
+        ],
+        [
+          22.862,
+          88.412
+        ],
+        [
+          22.831,
+          88.396
+        ],
+        [
+          22.798,
+          88.381
+        ],
+        [
+          22.7674,
+          88.37
+        ]
+      ]
+    },
+    {
+      "from": "N25",
+      "to": "N26",
+      "road_name": "Barrackpore Trunk (BT) Rd (North)",
+      "distance_km": 7.731,
+      "speed_limit_kmph": 50,
+      "traffic_weight": 1.45,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.7674,
+          88.37
+        ],
+        [
+          22.744,
+          88.3725
+        ],
+        [
+          22.721,
+          88.3748
+        ],
+        [
+          22.6995,
+          88.3765
+        ]
+      ]
+    },
+    {
+      "from": "N26",
+      "to": "N27",
+      "road_name": "Barrackpore Trunk (BT) Rd (Central)",
+      "distance_km": 5.218,
+      "speed_limit_kmph": 45,
+      "traffic_weight": 1.55,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.6995,
+          88.3765
+        ],
+        [
+          22.684,
+          88.377
+        ],
+        [
+          22.6685,
+          88.3772
+        ],
+        [
+          22.6535,
+          88.3775
+        ]
+      ]
+    },
+    {
+      "from": "N27",
+      "to": "N5",
+      "road_name": "BT Rd (Dunlop - Shyambazar)",
+      "distance_km": 5.913,
+      "speed_limit_kmph": 40,
+      "traffic_weight": 1.65,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.6535,
+          88.3775
+        ],
+        [
+          22.636,
+          88.3765
+        ],
+        [
+          22.6185,
+          88.375
+        ],
+        [
+          22.6015,
+          88.3735
+        ]
+      ]
+    },
+    {
+      "from": "N22",
+      "to": "N29",
+      "road_name": "NH-12 / Barasat Corridor",
+      "distance_km": 26.027,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.15,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.951,
+          88.458
+        ],
+        [
+          22.895,
+          88.468
+        ],
+        [
+          22.835,
+          88.474
+        ],
+        [
+          22.778,
+          88.479
+        ],
+        [
+          22.7225,
+          88.481
+        ]
+      ]
+    },
+    {
+      "from": "N25",
+      "to": "N29",
+      "road_name": "Barrackpore - Barasat Rd",
+      "distance_km": 12.678,
+      "speed_limit_kmph": 50,
+      "traffic_weight": 1.3,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.7674,
+          88.37
+        ],
+        [
+          22.755,
+          88.404
+        ],
+        [
+          22.74,
+          88.442
+        ],
+        [
+          22.7225,
+          88.481
+        ]
+      ]
+    },
+    {
+      "from": "N29",
+      "to": "N30",
+      "road_name": "NH-12 / Jessore Rd (Barasat - Madhyamgram)",
+      "distance_km": 3.769,
+      "speed_limit_kmph": 55,
+      "traffic_weight": 1.35,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.7225,
+          88.481
+        ],
+        [
+          22.711,
+          88.4745
+        ],
+        [
+          22.7015,
+          88.4695
+        ],
+        [
+          22.6925,
+          88.4655
+        ]
+      ]
+    },
+    {
+      "from": "N26",
+      "to": "N30",
+      "road_name": "Sodepur - Madhyamgram Rd",
+      "distance_km": 9.346,
+      "speed_limit_kmph": 45,
+      "traffic_weight": 1.3,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.6995,
+          88.3765
+        ],
+        [
+          22.6975,
+          88.406
+        ],
+        [
+          22.695,
+          88.436
+        ],
+        [
+          22.6925,
+          88.4655
+        ]
+      ]
+    },
+    {
+      "from": "N26",
+      "to": "N28",
+      "road_name": "Kalyani Expy - Nimta Spur",
+      "distance_km": 5.118,
+      "speed_limit_kmph": 65,
+      "traffic_weight": 1.15,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.6995,
+          88.3765
+        ],
+        [
+          22.685,
+          88.387
+        ],
+        [
+          22.673,
+          88.396
+        ],
+        [
+          22.6625,
+          88.4045
+        ]
+      ]
+    },
+    {
+      "from": "N27",
+      "to": "N28",
+      "road_name": "Belghoria Expressway (West)",
+      "distance_km": 3.005,
+      "speed_limit_kmph": 80,
+      "traffic_weight": 1.08,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.6535,
+          88.3775
+        ],
+        [
+          22.6565,
+          88.3865
+        ],
+        [
+          22.6598,
+          88.396
+        ],
+        [
+          22.6625,
+          88.4045
+        ]
+      ]
+    },
+    {
+      "from": "N28",
+      "to": "N30",
+      "road_name": "Belghoria Expy / Jessore Rd (Airport)",
+      "distance_km": 7.234,
+      "speed_limit_kmph": 75,
+      "traffic_weight": 1.12,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.6625,
+          88.4045
+        ],
+        [
+          22.668,
+          88.426
+        ],
+        [
+          22.679,
+          88.446
+        ],
+        [
+          22.6925,
+          88.4655
+        ]
+      ]
+    },
+    {
+      "from": "N28",
+      "to": "N17",
+      "road_name": "VIP Rd / Dum Dum - Ultadanga",
+      "distance_km": 7.96,
+      "speed_limit_kmph": 55,
+      "traffic_weight": 1.25,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.6625,
+          88.4045
+        ],
+        [
+          22.641,
+          88.403
+        ],
+        [
+          22.616,
+          88.397
+        ],
+        [
+          22.5937,
+          88.3895
+        ]
+      ]
+    },
+    {
+      "from": "N30",
+      "to": "N18",
+      "road_name": "VIP Rd / New Town - Karunamoyee",
+      "distance_km": 13.286,
+      "speed_limit_kmph": 60,
+      "traffic_weight": 1.2,
+      "bidirectional": true,
+      "blocked": false,
+      "geometry": [
+        [
+          22.6925,
+          88.4655
+        ],
+        [
+          22.656,
+          88.448
+        ],
+        [
+          22.619,
+          88.434
+        ],
+        [
+          22.5835,
+          88.419
+        ]
+      ]
     }
   ]
 }

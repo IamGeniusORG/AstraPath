@@ -37,3 +37,6 @@ rules.md
 phases.md
 design.md
 memory.md
+
+# Local user-saved offline places
+data/offline_places.json

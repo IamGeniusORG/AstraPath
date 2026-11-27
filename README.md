@@ -30,13 +30,13 @@ Unlike wrapper apps that outsource route calculation to external routing engines
 
 ## Features
 
+- **Multi-Modal Travel Profiles (6 Modes):** Optimize routes for **Car**, **Bike** (reduced jam sensitivity + 60 km/h cap), **Cycle** (16 km/h, expressway avoidance), **Walk** (5 km/h pedestrian-safe paths), **Train** (32-station Indian & West Bengal rail network with access legs), and **Flight** (22-airport corridor graph with 40-point great-circle arcs for trips >150 km), with live ETA badges across all 6 modes in one response.
+- **User-Saved Custom Offline Places:** Save any searched or map-picked place (`POST /api/offline/places`), automatically linked to its 3 nearest offline graph nodes and persisted in `data/offline_places.json` (plus `localStorage` backup) so A\* routes seamlessly even with zero internet.
+- **Automatic Online ↔ Offline Sync & Offline GPS:** Checks connectivity at startup and via a visibility-aware heartbeat (`/api/connectivity`), switching cleanly between Live and Offline modes while respecting manual overrides; Offline mode supports one-click live GPS origin routing (`origin_coords`) with `localStorage` last-fix fallback.
 - **Dual Optimization Objectives:** Switch instantaneously between **Fastest** (traffic-weighted ETA in minutes) and **Shortest** (road distance in km).
 - **From-Scratch Graph Search & Benchmarking:** Pure-Python `heapq` A\* and Dijkstra returning exact path cost, runtime (`ms`), nodes expanded, percentage reduction, and per-node `(g, h, f)` evaluation scores.
-- **Interactive Traffic Simulation & Road Closures:**
-  - Apply global traffic presets (**Normal**, **Rush Hour**, **Heavy**, **Reset**).
-  - Click any road segment directly on the map to inspect its length and speed limit, adjust its congestion multiplier (`1.0x–3.0x`), or close the road (`blocked: true`) to trigger immediate A\* detour recalculation.
-- **Cartographic Map-First UI:**
-  - Full-bleed `100vw × 100vh` Leaflet map with collapsible floating navigation panel, unified origin/destination rail, 3-tab progressive disclosure (**Directions**, **Algorithm**, **Traffic**), two-layer cased optimal route polyline (`#1E40AF` casing + `#3B82F6` inner stroke), toggleable **Graph** overlay with intersection tooltips, animated A\* search frontier wave + **Replay**, and **Map (Light)** / **Dark** / **Satellite** switcher.
+- **Interactive Traffic Simulation & Road Closures:** Apply traffic presets (**Normal**, **Rush Hour**, **Heavy**, **Reset**) or click any road segment directly on the map to adjust congestion (`1.0x–3.0x`) or close the road (`blocked: true`).
+- **60fps Cartographic Map-First UI:** Full-bleed `100vw × 100vh` Leaflet Canvas map (`preferCanvas: true`) with Google Maps-style **Layers** thumbnail popover (**Default / Dark / Satellite** + **Road Graph** / **Labels**), collapsible floating card, and 3-tab telemetry (**Directions**, **Algorithm**, **Traffic**).
 - **Standalone CLI Deliverable:** Flag-based and interactive terminal application (`cli.py`) outputting formatted turn-by-turn road tables and A\* vs. Dijkstra comparisons.
 
 ---
@@ -165,12 +165,29 @@ python cli.py
 | Method | Endpoint | Purpose | Request / Query Parameters |
 | --- | --- | --- | --- |
 | `GET` | `/` | Serves the AstraPath web dashboard | — |
-| `GET` | `/api/graph` | Returns the offline Kolkata graph (`nodes`, `edges`, metadata) | — |
-| `POST` | `/api/route` | Runs A\* & Dijkstra on the offline graph | `{"start": "N1", "end": "N15", "mode": "fastest", "traffic_overrides": {...}}` |
+| `GET` | `/api/connectivity` | Fast 1.5s cached online/offline check | — |
+| `GET` | `/api/graph` | Returns merged offline intersections, saved places & edges | — |
+| `GET` | `/api/offline/places` | Lists user-saved custom offline places & nodes | — |
+| `POST` | `/api/offline/places` | Saves a custom place and links it to 3 nearest offline nodes | `{"name": "...", "lat": float, "lng": float}` |
+| `DELETE` | `/api/offline/places/<id>` | Deletes a user-saved custom place | — |
+| `POST` | `/api/route` | Runs multi-modal A\* & Dijkstra on offline graph | `{"start": "N1", "end": "N15", "vehicle": "car", "mode": "fastest", "origin_coords": {...}}` |
 | `POST` | `/api/traffic/preset` | Updates offline graph traffic preset | `{"preset": "clear" \| "rush_hour" \| "random_jam" \| "default", "seed": 42}` |
 | `GET` | `/api/geocode` | Forward-geocodes a place query via Photon (Nominatim fallback) | `?q=<place_query>` (2–120 chars) |
 | `GET` | `/api/reverse-geocode` | Reverse-geocodes GPS coordinates into a short label | `?lat=<float>&lng=<float>` |
-| `POST` | `/api/route-live` | Extracts/caches OSM graph & runs A\* + Dijkstra | `{"start": {"lat", "lng", "name"}, "goal": {"lat", "lng", "name"}, "mode": "fastest"\|"shortest", "traffic_preset": "normal"\|"clear"\|"rush_hour"\|"random_jam", "traffic_overrides": {"E12": {"traffic_factor": 2.5, "blocked": false}}}` |
+| `POST` | `/api/route-live` | Extracts/caches OSM graph & runs multi-modal A\* + Dijkstra | `{"start": {...}, "goal": {...}, "vehicle": "car"\|"bike"\|"cycle"\|"walk"\|"train"\|"flight", "mode": "fastest"\|"shortest"}` |
+| `GET` | `/api/offline-bundle` | Returns `city_graph`, `rail_network`, and `airports` for browser offline caching | — |
+| `GET` | `/sw.js` | Serves the lightweight app-shell PWA Service Worker from root scope | — |
+
+---
+
+## Deploying to Vercel
+
+AstraPath is **100% Vercel-ready** out of the box with zero environment variables, zero external databases, and zero API keys required:
+
+1. Push the repository to GitHub (or import directly via Vercel CLI: `vercel --prod`).
+2. `vercel.json` routes `/static/*` directly from edge static hosting and routes `/`, `/sw.js`, and `/api/*` to `api/index.py` (`@vercel/python`).
+3. **Read-Only Filesystem Safe:** On Vercel (`VERCEL=1`), user-saved offline places automatically switch to `storage: "browser_only"` (`localStorage`) instead of writing to disk, and `POST /api/route` accepts stateless `custom_places`.
+4. **True Wi-Fi-Off Offline Mode:** On first visit, the PWA service worker (`static/sw.js`) caches the app shell and `/api/offline-bundle`, while `static/js/offline_engine.js` runs multi-modal A\*, Dijkstra comparison, and saved-place linking directly in the browser even when the network is completely disconnected.
 
 ---
 

@@ -27,6 +27,7 @@ class RouteSegment:
     travel_time_min: float
     edge_id: str = ""
     geometry: list[list[float]] = field(default_factory=list)
+    segment_type: str = "road"
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize route segment to a JSON-compatible dictionary."""
@@ -43,6 +44,7 @@ class RouteSegment:
             "traffic_factor": round(self.traffic_weight, 2),
             "travel_time_min": round(self.travel_time_min, 2),
             "geometry": self.geometry,
+            "segment_type": self.segment_type,
         }
 
 
@@ -94,13 +96,18 @@ def _compute_heuristic(
     node_id: str,
     goal_id: str,
     mode: str,
+    max_speed_kmph: float | None = None,
 ) -> float:
     """Compute admissible heuristic h(n) from node_id to goal_id."""
     current_node = graph.nodes[node_id]
     goal_node = graph.nodes[goal_id]
     if mode == "shortest":
         return heuristic_distance_km(current_node, goal_node)
-    return heuristic_time_min(current_node, goal_node, graph.max_speed_kmph)
+    return heuristic_time_min(
+        current_node,
+        goal_node,
+        max_speed_kmph if max_speed_kmph is not None else graph.max_speed_kmph,
+    )
 
 
 def _reconstruct_route(
@@ -109,6 +116,7 @@ def _reconstruct_route(
     goal_id: str,
     came_from: dict[str, tuple[str, RoadEdge]],
     effective_edges: dict[str, tuple[float, bool]],
+    vehicle: str = "car",
 ) -> tuple[list[str], list[str], list[RouteSegment], float, float, list[list[float]]]:
     """Reconstruct node sequence, segments, distance, and ETA from parent pointers."""
     reversed_edges: list[RoadEdge] = []
@@ -131,7 +139,12 @@ def _reconstruct_route(
 
     for edge in ordered_edges:
         eff_weight, _ = effective_edges[edge.directed_uid]
-        seg_time = edge.travel_time_min(eff_weight)
+        seg_time = graph.edge_cost(
+            edge,
+            mode="fastest",
+            traffic_weight=eff_weight,
+            vehicle=vehicle,
+        )
         total_distance_km += edge.distance_km
         estimated_time_min += seg_time
         u_node = graph.nodes[edge.source]
@@ -159,6 +172,7 @@ def _reconstruct_route(
                 travel_time_min=seg_time,
                 edge_id=edge.id,
                 geometry=seg_geom,
+                segment_type=edge.segment_type,
             )
         )
 
@@ -183,6 +197,7 @@ def _run_best_first_search(
     use_heuristic: bool,
     traffic_overrides: dict[str, Any] | None = None,
     traffic_preset: str | None = None,
+    vehicle: str = "car",
 ) -> SearchResult:
     """Execute priority-queue graph search (A* when use_heuristic=True, else Dijkstra).
 
@@ -199,6 +214,9 @@ def _run_best_first_search(
     if mode not in VALID_MODES:
         raise ValueError(f"Invalid mode '{mode}'. Expected one of {VALID_MODES}.")
 
+    from core.modes import max_effective_speed_for_graph
+
+    v_max_mode = max_effective_speed_for_graph(graph, vehicle)
     algorithm_name = "A*" if use_heuristic else "Dijkstra"
     effective_edges = graph.resolve_overrides(
         traffic_overrides=traffic_overrides,
@@ -229,7 +247,11 @@ def _run_best_first_search(
         )
 
     tie_counter = itertools.count()
-    initial_h = _compute_heuristic(graph, start_id, goal_id, mode) if use_heuristic else 0.0
+    initial_h = (
+        _compute_heuristic(graph, start_id, goal_id, mode, v_max_mode)
+        if use_heuristic
+        else 0.0
+    )
     open_heap: list[tuple[float, int, float, str]] = [
         (initial_h, next(tie_counter), 0.0, start_id)
     ]
@@ -272,6 +294,7 @@ def _run_best_first_search(
                 goal_id=goal_id,
                 came_from=came_from,
                 effective_edges=effective_edges,
+                vehicle=vehicle,
             )
             return SearchResult(
                 algorithm=algorithm_name,
@@ -299,14 +322,16 @@ def _run_best_first_search(
             if is_blocked or edge.target in closed_set:
                 continue
 
-            step_cost = graph.edge_cost(edge, mode=mode, traffic_weight=eff_weight)
+            step_cost = graph.edge_cost(
+                edge, mode=mode, traffic_weight=eff_weight, vehicle=vehicle
+            )
             tentative_g = current_g + step_cost
 
             if tentative_g < g_scores.get(edge.target, float("inf")):
                 g_scores[edge.target] = tentative_g
                 came_from[edge.target] = (current_id, edge)
                 h_val = (
-                    _compute_heuristic(graph, edge.target, goal_id, mode)
+                    _compute_heuristic(graph, edge.target, goal_id, mode, v_max_mode)
                     if use_heuristic
                     else 0.0
                 )
@@ -347,13 +372,9 @@ def astar_search(
     mode: str = "fastest",
     traffic_overrides: dict[str, Any] | None = None,
     traffic_preset: str | None = None,
+    vehicle: str = "car",
 ) -> SearchResult:
-    """Find the optimal route from start_id to goal_id using the A* algorithm.
-
-    Minimizes f(n) = g(n) + h(n), where g(n) is the cumulative road cost (distance
-    in km for 'shortest' mode, or traffic-adjusted travel time in minutes for
-    'fastest' mode) and h(n) is the admissible Haversine lower bound to goal_id.
-    """
+    """Find the optimal route from start_id to goal_id using the A* algorithm."""
     return _run_best_first_search(
         graph=graph,
         start_id=start_id,
@@ -362,6 +383,7 @@ def astar_search(
         use_heuristic=True,
         traffic_overrides=traffic_overrides,
         traffic_preset=traffic_preset,
+        vehicle=vehicle,
     )
 
 
@@ -372,12 +394,9 @@ def dijkstra_search(
     mode: str = "fastest",
     traffic_overrides: dict[str, Any] | None = None,
     traffic_preset: str | None = None,
+    vehicle: str = "car",
 ) -> SearchResult:
-    """Find the optimal route from start_id to goal_id using Dijkstra's algorithm.
-
-    Equivalent to A* with h(n) = 0 (minimizing f(n) = g(n)), used as an exact
-    uninformed baseline to benchmark A* optimality and node-expansion efficiency.
-    """
+    """Find the optimal route from start_id to goal_id using Dijkstra's algorithm."""
     return _run_best_first_search(
         graph=graph,
         start_id=start_id,
@@ -386,6 +405,7 @@ def dijkstra_search(
         use_heuristic=False,
         traffic_overrides=traffic_overrides,
         traffic_preset=traffic_preset,
+        vehicle=vehicle,
     )
 
 
@@ -396,6 +416,7 @@ def compare_algorithms(
     mode: str = "fastest",
     traffic_overrides: dict[str, Any] | None = None,
     traffic_preset: str | None = None,
+    vehicle: str = "car",
 ) -> dict[str, Any]:
     """Run both A* and Dijkstra on the same query and return combined telemetry."""
     astar_res = astar_search(
@@ -405,6 +426,7 @@ def compare_algorithms(
         mode=mode,
         traffic_overrides=traffic_overrides,
         traffic_preset=traffic_preset,
+        vehicle=vehicle,
     )
     dijkstra_res = dijkstra_search(
         graph=graph,
@@ -413,6 +435,7 @@ def compare_algorithms(
         mode=mode,
         traffic_overrides=traffic_overrides,
         traffic_preset=traffic_preset,
+        vehicle=vehicle,
     )
 
     if dijkstra_res.nodes_expanded > 0:

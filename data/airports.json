@@ -1,0 +1,642 @@
+{
+  "network": "Indian Air Corridors",
+  "max_speed_kmph": 780.0,
+  "airports": [
+    {
+      "id": "A_CCU",
+      "iata": "CCU",
+      "name": "Kolkata (CCU)",
+      "lat": 22.6547,
+      "lng": 88.4467
+    },
+    {
+      "id": "A_IXB",
+      "iata": "IXB",
+      "name": "Bagdogra (IXB)",
+      "lat": 26.6812,
+      "lng": 88.3286
+    },
+    {
+      "id": "A_RDP",
+      "iata": "RDP",
+      "name": "Durgapur (RDP)",
+      "lat": 23.6244,
+      "lng": 87.2422
+    },
+    {
+      "id": "A_PAT",
+      "iata": "PAT",
+      "name": "Patna (PAT)",
+      "lat": 25.5913,
+      "lng": 85.088
+    },
+    {
+      "id": "A_BBI",
+      "iata": "BBI",
+      "name": "Bhubaneswar (BBI)",
+      "lat": 20.2444,
+      "lng": 85.8178
+    },
+    {
+      "id": "A_GAU",
+      "iata": "GAU",
+      "name": "Guwahati (GAU)",
+      "lat": 26.1061,
+      "lng": 91.5859
+    },
+    {
+      "id": "A_IXR",
+      "iata": "IXR",
+      "name": "Ranchi (IXR)",
+      "lat": 23.3143,
+      "lng": 85.3217
+    },
+    {
+      "id": "A_DEL",
+      "iata": "DEL",
+      "name": "Delhi (DEL)",
+      "lat": 28.5562,
+      "lng": 77.1
+    },
+    {
+      "id": "A_BOM",
+      "iata": "BOM",
+      "name": "Mumbai (BOM)",
+      "lat": 19.0896,
+      "lng": 72.8656
+    },
+    {
+      "id": "A_BLR",
+      "iata": "BLR",
+      "name": "Bengaluru (BLR)",
+      "lat": 13.1986,
+      "lng": 77.7066
+    },
+    {
+      "id": "A_MAA",
+      "iata": "MAA",
+      "name": "Chennai (MAA)",
+      "lat": 12.9941,
+      "lng": 80.1709
+    },
+    {
+      "id": "A_HYD",
+      "iata": "HYD",
+      "name": "Hyderabad (HYD)",
+      "lat": 17.2403,
+      "lng": 78.4294
+    },
+    {
+      "id": "A_PNQ",
+      "iata": "PNQ",
+      "name": "Pune (PNQ)",
+      "lat": 18.5822,
+      "lng": 73.9197
+    },
+    {
+      "id": "A_AMD",
+      "iata": "AMD",
+      "name": "Ahmedabad (AMD)",
+      "lat": 23.0772,
+      "lng": 72.6347
+    },
+    {
+      "id": "A_COK",
+      "iata": "COK",
+      "name": "Kochi (COK)",
+      "lat": 10.152,
+      "lng": 76.4019
+    },
+    {
+      "id": "A_GOI",
+      "iata": "GOI",
+      "name": "Goa (GOI)",
+      "lat": 15.3808,
+      "lng": 73.8314
+    },
+    {
+      "id": "A_JAI",
+      "iata": "JAI",
+      "name": "Jaipur (JAI)",
+      "lat": 26.8242,
+      "lng": 75.8122
+    },
+    {
+      "id": "A_LKO",
+      "iata": "LKO",
+      "name": "Lucknow (LKO)",
+      "lat": 26.7606,
+      "lng": 80.8893
+    },
+    {
+      "id": "A_VNS",
+      "iata": "VNS",
+      "name": "Varanasi (VNS)",
+      "lat": 25.4524,
+      "lng": 82.8593
+    },
+    {
+      "id": "A_ATQ",
+      "iata": "ATQ",
+      "name": "Amritsar (ATQ)",
+      "lat": 31.7096,
+      "lng": 74.7973
+    },
+    {
+      "id": "A_IXC",
+      "iata": "IXC",
+      "name": "Chandigarh (IXC)",
+      "lat": 30.6735,
+      "lng": 76.7885
+    },
+    {
+      "id": "A_NAG",
+      "iata": "NAG",
+      "name": "Nagpur (NAG)",
+      "lat": 21.0922,
+      "lng": 79.0472
+    }
+  ],
+  "edges": [
+    {
+      "from": "A_CCU",
+      "to": "A_IXB",
+      "road_name": "Flight: CCU - IXB",
+      "distance_km": 456.843,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_GAU",
+      "road_name": "Flight: CCU - GAU",
+      "distance_km": 508.278,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_PAT",
+      "road_name": "Flight: CCU - PAT",
+      "distance_km": 481.415,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_BBI",
+      "road_name": "Flight: CCU - BBI",
+      "distance_km": 389.525,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_IXR",
+      "road_name": "Flight: CCU - IXR",
+      "distance_km": 334.753,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_DEL",
+      "road_name": "Flight: CCU - DEL",
+      "distance_km": 1338.67,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_BOM",
+      "road_name": "Flight: CCU - BOM",
+      "distance_km": 1699.007,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_BLR",
+      "road_name": "Flight: CCU - BLR",
+      "distance_km": 1577.697,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_MAA",
+      "road_name": "Flight: CCU - MAA",
+      "distance_km": 1412.944,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_HYD",
+      "road_name": "Flight: CCU - HYD",
+      "distance_km": 1231.335,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_PNQ",
+      "road_name": "Flight: CCU - PNQ",
+      "distance_km": 1608.85,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_AMD",
+      "road_name": "Flight: CCU - AMD",
+      "distance_km": 1652.341,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_JAI",
+      "road_name": "Flight: CCU - JAI",
+      "distance_km": 1383.846,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_LKO",
+      "road_name": "Flight: CCU - LKO",
+      "distance_km": 906.989,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_VNS",
+      "road_name": "Flight: CCU - VNS",
+      "distance_km": 659.86,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_CCU",
+      "to": "A_NAG",
+      "road_name": "Flight: CCU - NAG",
+      "distance_km": 1004.882,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_RDP",
+      "to": "A_DEL",
+      "road_name": "Flight: RDP - DEL",
+      "distance_km": 1174.098,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_RDP",
+      "to": "A_BOM",
+      "road_name": "Flight: RDP - BOM",
+      "distance_km": 1602.287,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_RDP",
+      "to": "A_BLR",
+      "road_name": "Flight: RDP - BLR",
+      "distance_km": 1564.334,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_RDP",
+      "to": "A_HYD",
+      "road_name": "Flight: RDP - HYD",
+      "distance_km": 1183.261,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_RDP",
+      "to": "A_MAA",
+      "road_name": "Flight: RDP - MAA",
+      "distance_km": 1425.175,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_BOM",
+      "road_name": "Flight: DEL - BOM",
+      "distance_km": 1159.794,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_BLR",
+      "road_name": "Flight: DEL - BLR",
+      "distance_km": 1743.017,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_MAA",
+      "road_name": "Flight: DEL - MAA",
+      "distance_km": 1794.564,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_HYD",
+      "road_name": "Flight: DEL - HYD",
+      "distance_km": 1290.893,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_AMD",
+      "road_name": "Flight: DEL - AMD",
+      "distance_km": 770.533,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_JAI",
+      "road_name": "Flight: DEL - JAI",
+      "distance_km": 235.189,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_LKO",
+      "road_name": "Flight: DEL - LKO",
+      "distance_km": 431.683,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_VNS",
+      "road_name": "Flight: DEL - VNS",
+      "distance_km": 680.027,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_ATQ",
+      "road_name": "Flight: DEL - ATQ",
+      "distance_km": 422.977,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_IXC",
+      "road_name": "Flight: DEL - IXC",
+      "distance_km": 242.098,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_PAT",
+      "road_name": "Flight: DEL - PAT",
+      "distance_km": 873.721,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_GAU",
+      "road_name": "Flight: DEL - GAU",
+      "distance_km": 1484.777,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_DEL",
+      "to": "A_IXB",
+      "road_name": "Flight: DEL - IXB",
+      "distance_km": 1147.81,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BOM",
+      "to": "A_BLR",
+      "road_name": "Flight: BOM - BLR",
+      "distance_km": 851.038,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BOM",
+      "to": "A_MAA",
+      "road_name": "Flight: BOM - MAA",
+      "distance_km": 1054.149,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BOM",
+      "to": "A_HYD",
+      "road_name": "Flight: BOM - HYD",
+      "distance_km": 635.164,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BOM",
+      "to": "A_PNQ",
+      "road_name": "Flight: BOM - PNQ",
+      "distance_km": 126.945,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BOM",
+      "to": "A_AMD",
+      "road_name": "Flight: BOM - AMD",
+      "distance_km": 452.928,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BOM",
+      "to": "A_GOI",
+      "road_name": "Flight: BOM - GOI",
+      "distance_km": 433.457,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BOM",
+      "to": "A_COK",
+      "road_name": "Flight: BOM - COK",
+      "distance_km": 1085.273,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BOM",
+      "to": "A_NAG",
+      "road_name": "Flight: BOM - NAG",
+      "distance_km": 696.441,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BLR",
+      "to": "A_MAA",
+      "road_name": "Flight: BLR - MAA",
+      "distance_km": 273.213,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BLR",
+      "to": "A_HYD",
+      "road_name": "Flight: BLR - HYD",
+      "distance_km": 465.177,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BLR",
+      "to": "A_COK",
+      "road_name": "Flight: BLR - COK",
+      "distance_km": 374.692,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_BLR",
+      "to": "A_GOI",
+      "road_name": "Flight: BLR - GOI",
+      "distance_km": 492.582,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_HYD",
+      "to": "A_MAA",
+      "road_name": "Flight: HYD - MAA",
+      "distance_km": 517.955,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    },
+    {
+      "from": "A_HYD",
+      "to": "A_NAG",
+      "road_name": "Flight: HYD - NAG",
+      "distance_km": 441.861,
+      "speed_limit_kmph": 780.0,
+      "traffic_weight": 1.0,
+      "bidirectional": true,
+      "segment_type": "flight"
+    }
+  ]
+}

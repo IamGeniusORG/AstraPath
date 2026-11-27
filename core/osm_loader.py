@@ -34,9 +34,10 @@ MIN_BBOX_PAD_DEG: float = 0.008
 MAX_BBOX_PAD_DEG: float = 0.025
 BBOX_PAD_RATIO: float = 0.12
 
-OVERPASS_CONNECT_TIMEOUT_S: float = 3.5
-OVERPASS_READ_TIMEOUT_S: float = 10.0
+OVERPASS_CONNECT_TIMEOUT_S: float = 2.5
+OVERPASS_READ_TIMEOUT_S: float = 4.5
 CORRIDOR_TIMEOUT_S: float = 6.0
+OVERPASS_MAX_DISTANCE_KM: float = 10.0
 
 CACHE_TTL_SECONDS: int = 900
 CACHE_MAX_REGIONS: int = 10
@@ -166,7 +167,7 @@ def _geocode_via_photon(clean_q: str, limit: int) -> list[dict[str, Any]]:
         PHOTON_SEARCH_URL,
         params={"q": clean_q, "limit": limit},
         headers={"User-Agent": USER_AGENT},
-        timeout=6,
+        timeout=4.5,
     )
     resp.raise_for_status()
     payload = resp.json()
@@ -190,7 +191,7 @@ def _geocode_via_nominatim(clean_q: str, limit: int) -> list[dict[str, Any]]:
             "addressdetails": 1,
         },
         headers={"User-Agent": USER_AGENT},
-        timeout=8,
+        timeout=4.5,
     )
     resp.raise_for_status()
     items = resp.json()
@@ -266,7 +267,7 @@ def reverse_geocode(lat: float, lng: float) -> dict[str, Any]:
                 "addressdetails": 1,
             },
             headers={"User-Agent": USER_AGENT},
-            timeout=8,
+            timeout=4.5,
         )
         resp.raise_for_status()
         item = resp.json()
@@ -354,32 +355,28 @@ def _race_overpass_tier(
     """Race Overpass mirrors for a given highway filter using single-pass out geom."""
     south, west, north, east = bbox
     query = (
-        "[out:json][timeout:12];\n"
+        "[out:json][timeout:5];\n"
         f'(way["highway"~"^({highway_regex})$"]({south:.5f},{west:.5f},{north:.5f},{east:.5f}););\n'
         "out geom;\n"
     )
 
     last_error: Exception | None = None
-    primary_mirrors = OVERPASS_MIRRORS[:2]
-    executor = ThreadPoolExecutor(max_workers=len(primary_mirrors))
+    executor = ThreadPoolExecutor(max_workers=len(OVERPASS_MIRRORS))
     try:
         futures = {
             executor.submit(_query_overpass_mirror, mirror, query): mirror
-            for mirror in primary_mirrors
+            for mirror in OVERPASS_MIRRORS
         }
-        for future in as_completed(futures):
-            try:
-                return future.result()
-            except Exception as exc:
-                last_error = exc
+        try:
+            for future in as_completed(futures, timeout=OVERPASS_READ_TIMEOUT_S + 0.5):
+                try:
+                    return future.result()
+                except Exception as exc:
+                    last_error = exc
+        except TimeoutError as exc:
+            last_error = exc
     finally:
         executor.shutdown(wait=False, cancel_futures=True)
-
-    for mirror_url in OVERPASS_MIRRORS[2:]:
-        try:
-            return _query_overpass_mirror(mirror_url, query)
-        except Exception as exc:
-            last_error = exc
 
     raise OSMServiceError(f"Overpass mirrors failed ({last_error}).")
 
@@ -389,13 +386,9 @@ def fetch_overpass_elements(
     tier_name: str,
     highway_regex: str,
 ) -> list[dict[str, Any]]:
-    """Query Overpass with coarse-tier retry if the detailed tier fails/times out."""
-    try:
-        return _race_overpass_tier(bbox, highway_regex)
-    except OSMServiceError:
-        if tier_name != "highway":
-            return _race_overpass_tier(bbox, "motorway|trunk|primary")
-        raise
+    """Query Overpass once with a strict timeout; fall back to corridor graph on failure."""
+    del tier_name
+    return _race_overpass_tier(bbox, highway_regex)
 
 
 def _parse_speed_limit(tags: dict[str, Any], highway_type: str) -> float:
@@ -591,6 +584,8 @@ def contract_osm_data(
                             bidirectional=True,
                             blocked=False,
                             geometry=geometry,
+                            segment_type="road",
+                            highway_type=highway_type,
                         )
                     )
                     vertex_road_hints.setdefault(u_nid, [])
@@ -831,18 +826,67 @@ def _prune_cache() -> None:
         _GRAPH_CACHE.popitem(last=False)
 
 
+def _live_cache_key(
+    start_lat: float,
+    start_lng: float,
+    goal_lat: float,
+    goal_lng: float,
+    tier_name: str,
+) -> tuple[tuple[tuple[float, float], tuple[float, float]], str]:
+    """Order-independent cache key for (start, goal, tier) rounded to ~110m."""
+    p1 = (round(start_lat, 3), round(start_lng, 3))
+    p2 = (round(goal_lat, 3), round(goal_lng, 3))
+    pair = (p1, p2) if p1 <= p2 else (p2, p1)
+    return (pair, tier_name)
+
+
+def get_cached_live_graph(
+    start_lat: float,
+    start_lng: float,
+    goal_lat: float,
+    goal_lng: float,
+) -> tuple[CityGraph, dict[str, Any]] | None:
+    """Return cached live graph if already extracted, without external HTTP calls."""
+    straight_km = haversine_km(start_lat, start_lng, goal_lat, goal_lng)
+    if straight_km > MAX_LIVE_DISTANCE_KM:
+        return None
+    tier_name, _ = select_road_tier(straight_km)
+    cache_key = _live_cache_key(start_lat, start_lng, goal_lat, goal_lng, tier_name)
+    _prune_cache()
+    cached = _GRAPH_CACHE.get(cache_key)
+    if cached is None:
+        return None
+    _, graph, graph_source = cached
+    _GRAPH_CACHE.move_to_end(cache_key)
+    start_node_id, snap_start_km = snap_to_nearest_node(graph, start_lat, start_lng)
+    goal_node_id, snap_goal_km = snap_to_nearest_node(graph, goal_lat, goal_lng)
+    meta = {
+        "road_tier": tier_name,
+        "graph_source": graph_source,
+        "cache_hit": True,
+        "straight_distance_km": round(straight_km, 2),
+        "long_distance_notice": "Long-distance highway mode active"
+        if straight_km > LONG_DISTANCE_THRESHOLD_KM
+        else None,
+        "start_node_id": start_node_id,
+        "goal_node_id": goal_node_id,
+        "snap_start_km": round(snap_start_km, 3),
+        "snap_goal_km": round(snap_goal_km, 3),
+    }
+    return graph, meta
+
+
 def get_live_graph(
     start_lat: float,
     start_lng: float,
     goal_lat: float,
     goal_lng: float,
 ) -> tuple[CityGraph, dict[str, Any]]:
-    """Return cached/fresh OSM CityGraph, falling back to corridor graph if Overpass is busy."""
+    """Return cached/fresh OSM CityGraph, using fast corridor graph for >10km or busy Overpass."""
     straight_km = haversine_km(start_lat, start_lng, goal_lat, goal_lng)
     tier_name, highway_regex = select_road_tier(straight_km)
     bbox = compute_padded_bbox(start_lat, start_lng, goal_lat, goal_lng)
-    rounded_bbox = tuple(round(val, 2) for val in bbox)
-    cache_key = (rounded_bbox, tier_name)
+    cache_key = _live_cache_key(start_lat, start_lng, goal_lat, goal_lng, tier_name)
 
     _prune_cache()
     cached = _GRAPH_CACHE.get(cache_key)
@@ -852,6 +896,12 @@ def get_live_graph(
         _, graph, graph_source = cached
         _GRAPH_CACHE.move_to_end(cache_key)
         cache_hit = True
+    elif straight_km > OVERPASS_MAX_DISTANCE_KM:
+        # Skip Overpass completely above 10 km so routes resolve in 1-2s
+        graph = build_corridor_fallback_graph(start_lat, start_lng, goal_lat, goal_lng)
+        graph_source = "corridor_fallback"
+        _GRAPH_CACHE[cache_key] = (time.time(), graph, graph_source)
+        _prune_cache()
     else:
         try:
             elements = fetch_overpass_elements(bbox, tier_name, highway_regex)

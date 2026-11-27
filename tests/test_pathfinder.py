@@ -22,8 +22,8 @@ def city_graph() -> CityGraph:
 
 def test_dataset_invariants_and_connectivity(city_graph: CityGraph) -> None:
     """Verify node/edge counts, full connectivity, and A* admissibility invariants."""
-    assert 18 <= len(city_graph.nodes) <= 25
-    assert len(city_graph.raw_edges) >= 30
+    assert 30 <= len(city_graph.nodes) <= 40
+    assert len(city_graph.raw_edges) >= 60
     assert city_graph.is_connected() is True
     assert city_graph.validate_admissibility() == []
 
